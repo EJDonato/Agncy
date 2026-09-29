@@ -1,372 +1,173 @@
-# AGENTS SPECIFICATION: Agncy
+# AGENTS.md: Coding Standards & Engineering Directives
 
-**Status:** Approved Specification  
+**Target Audience:** AI Coding Agents & Pair-Programming Assistants (Antigravity, Cursor, Claude Code)  
 **Project:** Agncy (Personal Content Agency Workspace)  
-**AI Runtime:** Google Gemini API (`@google/genai` SDK)  
-**Supported Models:**  
-- **Gemini 2.5 / 1.5 Pro:** High-reasoning tasks (Script generation, style rule synthesis)  
-- **Gemini 2.5 / 1.5 Flash:** High-speed tasks (Diff analysis, trend research, fuzzy post matching, transcript optimization)  
+**Stack:** Next.js 15+ (App Router), TypeScript (Strict), SQLite (WAL Mode via Drizzle / `better-sqlite3`), Tailwind CSS, Google Gemini SDK (`@google/genai`), FFmpeg, `mlx-whisper` / `whisper.cpp`.  
 **Last Updated:** September 29, 2026  
 
 ---
 
-## 1. Agent Architecture & Orchestration
+## 1. Prime Directives for the Coding Agent
 
-Agncy utilizes specialized, decoupled agents rather than a single monolithic prompt. Each agent has an isolated directive, explicit input/output schemas, and strict deterministic guardrails.
+As the autonomous coding agent on this codebase, you must adhere to the highest standards of software craft. Agncy is a local-first, precision studio application. You are expected to write code that is clean, modular, resilient, and adheres strictly to the architectural specifications.
 
-```mermaid
-flowchart TD
-    subgraph BrandBrainContext ["Brand Brain Store (SQLite)"]
-        BP["Brand Profile (Tone, Language)"]
-        SR["Active Style Rules"]
-        FS["Top 3 Script Few-Shot Pairs"]
-        DiffHistory["Script Diffs History"]
-        Posts["Meta Post Performance"]
-    end
+### The Non-Negotiable Core Rules:
+1. **Strict File Size Limits (Max 250–300 LOC):** Never write monster files. Any file exceeding 250 lines must be split into dedicated subcomponents, custom hooks, or helper utilities.
+2. **DRY (Don't Repeat Yourself):** Never duplicate utility functions, data transformations, or query logic. Centralize shared behaviors in `/lib`.
+3. **Single Responsibility Principle (SRP):** Components only render and capture events. Business logic lives in domain services. Database operations live in the database layer.
+4. **Strict TypeScript (Zero `any`):** Never use `any`. Always use explicit interfaces, discriminated unions, and validate all untrusted inputs with **Zod**.
+5. **Fail Gracefully & Defensively:** Local processes (FFmpeg, Whisper) and external AI APIs can fail or hang. Always implement timeouts, error boundaries, and user-facing fallbacks.
 
-    subgraph Agents ["Google Gemini Agent Fleet"]
-        ScriptWriter["1. ScriptWriterAgent (Gemini Pro)"]
-        DiffAnalyzer["2. DiffAnalysisAgent (Gemini Flash)"]
-        StyleSynthesizer["3. StyleSynthesizerAgent (Gemini Pro)"]
-        IdeaResearcher["4. IdeaResearchAgent (Gemini Flash + Search)"]
-        PostMatcher["5. PostScriptMatcherAgent (Gemini Flash)"]
-        TranscriptCleaner["6. TranscriptOptimizerAgent (Gemini Flash)"]
-    end
+---
 
-    BP & SR & FS --> ScriptWriter
-    ScriptWriter --> UserEdit["User Manual Editing"]
-    UserEdit --> DiffAnalyzer
-    DiffAnalyzer --> DiffHistory
-    DiffHistory --> StyleSynthesizer
-    StyleSynthesizer -.->|Human Approval| SR
+## 2. Code Organization & Modularity Standards
 
-    BP & Posts --> IdeaResearcher
-    IdeaResearcher --> ScriptWriter
+### 2.1 File Length & Decomposition Protocol
+* **Hard Ceiling:** **300 Lines of Code (LOC)** per file.
+* **Soft Target:** **100–180 LOC** per file.
+* If a React component approaches 200 lines:
+  * Extract presentational subcomponents into a `_components/` folder co-located with the route.
+  * Extract complex state transitions, effects, and calculations into a custom hook in `hooks/`.
+  * Extract data formatting and pure functions into a `utils.ts` or `/lib`.
 
-    Posts & ScriptWriter --> PostMatcher
+### 2.2 Directory Structure Boundaries
+```
+agncy/
+├── app/                  # Next.js App Router (Routing, Layouts, Server Pages)
+│   ├── (workspace)/      # App Shell with persistent sidebar
+│   │   ├── scripts/      # Route entrypoints ONLY (keep page.tsx slim!)
+│   │   │   ├── [id]/
+│   │   │   │   ├── page.tsx          # Max 80 lines: loads data, passes to client view
+│   │   │   │   ├── _components/      # SplitEditor, DiffViewer, MetricFooter
+│   │   │   │   └── _hooks/           # useScriptEditor, useDiffCalculator
+├── lib/                  # Pure logic & domain services (NO JSX!)
+│   ├── db/               # SQLite connection, Drizzle schema, migrations, queries
+│   ├── ai/               # Gemini API client, system prompts, output schemas
+│   ├── analytics/        # CSV parser, BOM stripper, Unicode bold normalizer
+│   ├── diff/             # Tokenizer, Longest Common Subsequence (LCS) engine
+│   └── media/            # Subprocess runners (FFmpeg, Whisper, ASS generator)
+├── components/ui/        # Reusable primitive UI widgets (buttons, modals, badges)
+└── types/                # Global TypeScript definitions & Zod schemas
 ```
 
 ---
 
-## 2. Agent Fleet Specifications
+## 3. TypeScript & Type Safety Discipline
 
-### 2.1 Agent 1: `ScriptWriterAgent`
-
-* **Purpose:** Drafts high-retention short-form video scripts (Reels, TikTok, Shorts) embodying the creator's voice, formatting rules, and learned style patterns.
-* **Model:** `gemini-1.5-pro` (or `gemini-2.5-pro`)
-* **Temperature:** `0.7` (Balances creativity with strict style adherence)
-
-#### System Directive & Guardrails
-```markdown
-You are the dedicated in-house lead scriptwriter for Agncy. Your sole responsibility is to draft compelling, high-retention short-form video scripts (30 to 60 seconds) strictly calibrated to the creator's Brand Brain.
-
-# CORE RULES
-1. NEVER start with generic greetings (e.g., "Hey guys", "What's up", "Kumusta mga ka-tropa"). Start directly at the center of the premise or paradox within the first 3 seconds.
-2. STRICTLY honor the creator's language mix (e.g. natural conversational Taglish: English concepts blended with conversational Filipino sentence structures and emotional particles: "kasi", "naman", "ba", "talaga").
-3. Adhere strictly to the APPROVED STYLE RULES provided in the prompt context.
-4. Provide concrete visual cue directions alongside each spoken line so filming is effortless.
-5. The output must strictly conform to the JSON schema.
-```
-
-#### Input Context Payload
-```json
-{
-  "topic": "Why most community projects fail in their first 30 days",
-  "target_duration_sec": 45,
-  "format": "Reel",
-  "brand_profile": {
-    "creator_name": "Elton",
-    "niche": "Civic innovation and community tech projects",
-    "tone": "Direct, empathetic, grounded, analytical",
-    "language_mix": "Conversational Taglish (Filipino/English)"
-  },
-  "active_style_rules": [
-    "Hook must be under 8 words and state a counter-intuitive observation.",
-    "Do not use rhetorical corporate buzzwords like 'synergy' or 'empowerment'.",
-    "Keep total speaking word count between 110 and 130 words for a 45s Reel."
-  ],
-  "few_shot_examples": [
-    {
-      "title": "Stop Building Apps Nobody Asked For",
-      "hook": "90% of civic apps fail. Here is why.",
-      "performance_summary": "15.8k views, 11.2s avg retention"
-    }
-  ]
-}
-```
-
-#### Output Schema (Structured JSON)
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "properties": {
-    "title": { "type": "string" },
-    "estimated_duration_sec": { "type": "integer" },
-    "total_word_count": { "type": "integer" },
-    "hook": {
-      "type": "object",
-      "properties": {
-        "visual_cue": { "type": "string" },
-        "spoken_text": { "type": "string" },
-        "duration_est_sec": { "type": "number" }
-      },
-      "required": ["visual_cue", "spoken_text", "duration_est_sec"]
-    },
-    "body_beats": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "beat_number": { "type": "integer" },
-          "visual_cue": { "type": "string" },
-          "spoken_text": { "type": "string" },
-          "pacing": { "type": "string", "enum": ["rapid", "deliberate", "punchy"] }
-        },
-        "required": ["beat_number", "visual_cue", "spoken_text", "pacing"]
-      }
-    },
-    "cta": {
-      "type": "object",
-      "properties": {
-        "visual_cue": { "type": "string" },
-        "spoken_text": { "type": "string" }
-      },
-      "required": ["visual_cue", "spoken_text"]
-    }
-  },
-  "required": ["title", "estimated_duration_sec", "total_word_count", "hook", "body_beats", "cta"]
-}
-```
-
----
-
-### 2.2 Agent 2: `DiffAnalysisAgent`
-
-* **Purpose:** Analyzes the differences between the AI initial draft and the user's saved final script, attributing user motivations and structural edits.
-* **Model:** `gemini-1.5-flash`
-* **Temperature:** `0.2` (Deterministic analysis)
-
-#### System Directive & Guardrails
-```markdown
-You are an expert computational editor. You analyze what a human creator changed when editing an AI-generated script.
-Your job is NOT to praise or criticize, but to objectively categorize:
-1. What was deleted? (e.g. unnecessary context, formal jargon)
-2. What was added? (e.g. personal anecdotes, Taglish colloquial phrases)
-3. How did pacing or hook structure shift?
-```
-
-#### Output Schema (Structured JSON)
-```json
-{
-  "type": "object",
-  "properties": {
-    "hook_changes": {
-      "type": "object",
-      "properties": {
-        "change_type": { "type": "string", "enum": ["unchanged", "minor_edit", "complete_rewrite", "shortened"] },
-        "explanation": { "type": "string" }
-      },
-      "required": ["change_type", "explanation"]
-    },
-    "vocabulary_shifts": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "ai_phrase": { "type": "string" },
-          "user_replacement": { "type": "string" },
-          "reason_inferred": { "type": "string" }
-        },
-        "required": ["ai_phrase", "user_replacement"]
-      }
-    },
-    "length_delta_words": { "type": "integer" },
-    "conciseness_summary": { "type": "string" }
-  },
-  "required": ["hook_changes", "vocabulary_shifts", "length_delta_words", "conciseness_summary"]
-}
-```
-
----
-
-### 2.3 Agent 3: `StyleSynthesizerAgent`
-
-* **Purpose:** Synthesizes patterns from multiple saved script diffs (triggered every 5+ scripts) and drafts proposed **Style Rules** for user review and approval.
-* **Model:** `gemini-1.5-pro`
-* **Temperature:** `0.3`
-
-#### System Directive & Guardrails
-```markdown
-You are the Brand Voice Architect for Agncy. You observe how the creator continually edits AI drafts.
-Your objective is to propose actionable, high-confidence style guidelines that will prevent the AI from making the same mistakes in future drafts.
-
-# GUARDRAILS:
-1. Do not propose vague advice (e.g., "Make it more engaging"). Every proposed rule MUST be an explicit constraint (e.g. "Do not use three-syllable adjectives in the hook", "Substitute Taglish filler 'grabe' instead of 'sobrang'").
-2. Only propose rules observed in at least 2 distinct script diffs.
-3. Every rule is flagged with a 'proposed' status. The human user has final veto power.
-```
-
-#### Output Schema (Structured JSON)
-```json
-{
-  "type": "object",
-  "properties": {
-    "proposed_rules": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "category": { "type": "string", "enum": ["hook", "pacing", "vocabulary", "structure", "tone"] },
-          "rule_text": { "type": "string" },
-          "rationale": { "type": "string" },
-          "confidence_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
-          "supporting_script_ids": { "type": "array", "items": { "type": "string" } }
-        },
-        "required": ["category", "rule_text", "rationale", "confidence_score", "supporting_script_ids"]
-      }
-    }
-  },
-  "required": ["proposed_rules"]
-}
-```
-
----
-
-### 2.4 Agent 4: `IdeaResearchAgent`
-
-* **Purpose:** Discovers trending topics and content angles in the creator's niche using Google Search Grounding and ranks ideas against proven past post metrics.
-* **Model:** `gemini-1.5-flash` with Google Search Tool enabled
-* **Temperature:** `0.7`
-
-#### Tool Configuration (Gemini Google Search Grounding)
-```typescript
-import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI();
-const response = await ai.models.generateContent({
-  model: "gemini-1.5-flash",
-  contents: "Find 5 emerging issues or questions in Philippine civic technology and local community governance this week.",
-  config: {
-    tools: [{ googleSearch: {} }] // Native Google Search grounding
-  }
-});
-```
-
-#### Output Schema (Structured JSON)
-```json
-{
-  "type": "object",
-  "properties": {
-    "ideas": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "topic": { "type": "string" },
-          "angle_hook": { "type": "string" },
-          "why_suggested": { "type": "string" },
-          "predicted_fit_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
-          "target_audience_segment": { "type": "string" },
-          "search_reference_urls": { "type": "array", "items": { "type": "string" } }
-        },
-        "required": ["topic", "angle_hook", "why_suggested", "predicted_fit_score"]
-      }
-    }
-  },
-  "required": ["ideas"]
-}
-```
-
----
-
-### 2.5 Agent 5: `PostScriptMatcherAgent`
-
-* **Purpose:** Matches raw imported Meta Business Suite post captions to saved scripts in the local database, solving the disconnected analytics loop.
-* **Model:** `gemini-1.5-flash`
-* **Temperature:** `0.0` (Strict deterministic matching)
-
-#### Input & Output Definition
-* **Input:** A list of unlinked Meta posts (`post_id`, `normalized_caption`, `publish_time`) and candidate scripts (`script_id`, `title`, `hook_text`, `created_at`).
-* **Output Schema:**
-```json
-{
-  "type": "object",
-  "properties": {
-    "matches": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "post_id": { "type": "string" },
-          "script_id": { "type": "string" },
-          "confidence_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
-          "matching_evidence": { "type": "string" }
-        },
-        "required": ["post_id", "script_id", "confidence_score", "matching_evidence"]
-      }
-    }
-  },
-  "required": ["matches"]
-}
-```
-
----
-
-### 2.6 Agent 6: `TranscriptOptimizerAgent`
-
-* **Purpose:** Post-processes Whisper raw output to fix common Taglish particle mishearings, colloquial capitalizations, and timing segment breaks.
-* **Model:** `gemini-1.5-flash`
-* **Temperature:** `0.1`
-
-#### Directives & Guardrails
-```markdown
-You receive a raw Whisper transcript with timestamps from a spoken Taglish video.
-Whisper occasionally mistranscribes rapid Filipino conversational particles (e.g. transcribing "ba" as "pa", or "naman" as "number").
-Your tasks:
-1. Fix obvious Taglish mishearings using context, without altering the timing boundaries.
-2. Format casing and clean punctuation for short-form video subtitles.
-3. DO NOT remove words or add new words that were not spoken.
-```
-
----
-
-## 3. Gemini SDK Implementation Standard
-
-All agent interactions must use the unified Google Gemini SDK:
+* **Strict Mode:** TypeScript `strict: true` is strictly enforced.
+* **No `any` Ever:** Use `unknown` with type narrowers, generics, or Zod schemas.
+* **Zod for External Boundaries:**
+  * Every Meta CSV row must be validated and parsed using a Zod schema.
+  * Every structured JSON response from Google Gemini must be validated with Zod before being saved to SQLite.
+  * Server Actions must parse their incoming arguments with Zod.
 
 ```typescript
-import { GoogleGenAI, Type, Schema } from "@google/genai";
+// Example: Validating Gemini JSON responses
+import { z } from "zod";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY
+export const ScriptDraftSchema = z.object({
+  title: z.string().min(1),
+  estimated_duration_sec: z.number().int().positive(),
+  total_word_count: z.number().int().positive(),
+  hook: z.object({
+    visual_cue: z.string(),
+    spoken_text: z.string(),
+    duration_est_sec: z.number(),
+  }),
+  body_beats: z.array(
+    z.object({
+      beat_number: z.number(),
+      visual_cue: z.string(),
+      spoken_text: z.string(),
+      pacing: z.enum(["rapid", "deliberate", "punchy"]),
+    })
+  ),
+  cta: z.object({
+    visual_cue: z.string(),
+    spoken_text: z.string(),
+  }),
 });
 
-export async function executeAgent<T>(params: {
-  model: string;
-  systemInstruction: string;
-  prompt: string;
-  responseSchema?: Schema;
-}): Promise<T> {
-  const response = await ai.models.generateContent({
-    model: params.model,
-    contents: params.prompt,
-    config: {
-      systemInstruction: params.systemInstruction,
-      responseMimeType: params.responseSchema ? "application/json" : "text/plain",
-      responseSchema: params.responseSchema,
-    }
-  });
-
-  return JSON.parse(response.text!) as T;
-}
+export type ScriptDraft = z.infer<typeof ScriptDraftSchema>;
 ```
 
 ---
 
-## 4. Token Economics & Rate Limit Management
+## 4. Local Database & SQLite Conventions
 
-* **Pro vs. Flash Division:**
-  * **Gemini Flash** handles 85% of volume (diff tokens, CSV post matching, transcript optimization). Flash is nearly instantaneous (sub-second) and uses minimal quota.
-  * **Gemini Pro** is reserved for high-value creative generation (Script drafting and Style Synthesis).
-* **Caching with Context:** For extensive brand guidelines and few-shot pairs, leverage Gemini's context caching for repetitive script drafts, reducing latency and quota consumption.
+1. **WAL Mode Enabled:**
+   * Always initialize the SQLite database with Write-Ahead Logging:
+     ```typescript
+     db.run("PRAGMA journal_mode = WAL;");
+     db.run("PRAGMA synchronous = NORMAL;");
+     db.run("PRAGMA busy_timeout = 5000;");
+     ```
+2. **Zero Raw SQL Concatenation:**
+   * Never concatenate variables into SQL strings. Always use Drizzle ORM query builders or parameterized placeholders (`?`).
+3. **Atomic Transactions:**
+   * Whenever updating multiple related tables (e.g. saving a new script version AND computing/saving its diff), wrap the operations in a transaction:
+     ```typescript
+     await db.transaction(async (tx) => {
+       await tx.insert(scriptVersions).values(newVersion);
+       await tx.insert(scriptDiffs).values(computedDiff);
+     });
+     ```
+4. **Data Normalization:**
+   * Clean captions upon ingestion (strip mathematical bold fonts and UTF-8 BOM) before storing in the database. Never push raw, unsearchable text into primary query fields.
+
+---
+
+## 5. Local Subprocess Safety (FFmpeg & Whisper)
+
+1. **Never Block Node's Event Loop:**
+   * Never use `execSync` for video rendering or Whisper transcription.
+   * Always use `child_process.spawn` or Node's `Worker Threads`.
+2. **Prevent Zombie & Orphaned Processes:**
+   * Maintain an active child process registry in `lib/media/process-manager.ts`.
+   * Register `process.on('SIGINT')`, `process.on('SIGTERM')`, and `process.on('exit')` cleanup handlers to kill running FFmpeg or Whisper processes when the Next.js server restarts.
+3. **Stream Progress via SSE / Server Actions:**
+   * Parse `stderr` output from FFmpeg (e.g. `time=00:00:15.20`) to calculate render percentage and stream real-time progress to the UI.
+4. **Hardware Acceleration:**
+   * Always prefer Apple Silicon hardware acceleration (`-c:v h264_videotoolbox`) on macOS rather than software `libx264`.
+
+---
+
+## 6. React & Next.js App Router Conventions
+
+1. **Server Components First (`RSC`):**
+   * Default every component to a Server Component.
+   * Only add `'use client'` when state (`useState`, `useReducer`), effects, browser event listeners, or interactive UI elements (e.g. text editors, drag-and-drop zones) are required.
+2. **Skinny Server Pages:**
+   * Route `page.tsx` files should rarely exceed 80 lines. Their role is solely to authenticate/validate params, fetch data, and pass props to the view.
+3. **Design System Adherence:**
+   * Follow the color and typography tokens defined in [BRAND.md](file:///Users/eltonjames/Desktop/Personal%20Apps/Agncy/BRAND.md).
+   * Background: Deep obsidian (`bg-[#090A0F]`), cards: raised surface (`bg-[#14171F]`), borders: subtle border (`border-[#262B36]`), accent: amber (`text-[#F59E0B]`), success: emerald (`text-[#10B981]`).
+   * Scripts and diffs must always use monospaced fonts (`font-mono` / Geist Mono / JetBrains Mono).
+4. **Optimistic Updates:**
+   * For frequent user actions (approving style rules, editing script lines, toggling calendar dates), update the local UI state optimistically before waiting for the roundtrip.
+
+---
+
+## 7. AI & Google Gemini Integration Rules
+
+1. **SDK Standard:**
+   * Always use `@google/genai` (the official unified Google Gen AI SDK).
+2. **Model Division:**
+   * Use **Gemini Flash** (`gemini-1.5-flash` or `gemini-2.5-flash`) for rapid sub-second tasks: diff analysis, fuzzy CSV post matching, transcript optimization, and search-grounded trend detection.
+   * Use **Gemini Pro** (`gemini-1.5-pro` or `gemini-2.5-pro`) for high-reasoning tasks: script drafting with few-shot context and weekly style rule synthesis.
+3. **Dynamic Few-Shot Budgeting:**
+   * Never inject unlimited past scripts into prompts. Limit few-shots to the top 2–3 most relevant pairs to protect prompt clarity and reduce token latency.
+4. **Structured JSON Mode:**
+   * Always configure `responseMimeType: "application/json"` and pass `responseSchema` for any agent task that returns structured data.
+
+---
+
+## 8. Agent Pre-Commit & Verification Checklist
+
+Before reporting any feature or task as complete, verify:
+- [ ] **LOC Check:** Are all new and modified files under the 300 LOC ceiling?
+- [ ] **Modularity:** Has repeated logic been extracted to `/lib`?
+- [ ] **Type Check:** Does `tsc --noEmit` run with 0 errors?
+- [ ] **Lint & Build:** Does the Next.js build compile cleanly?
+- [ ] **Design Match:** Are styling, colors, and typography aligned with [BRAND.md](file:///Users/eltonjames/Desktop/Personal%20Apps/Agncy/BRAND.md)?
+- [ ] **Error Handling:** Are there user-facing error states for missing files, corrupt CSV rows, or Gemini API errors?
