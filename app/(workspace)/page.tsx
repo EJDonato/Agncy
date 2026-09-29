@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, Sparkles, TrendingUp, ShieldCheck, FileEdit, Plus } from "lucide-react";
 import { getPostsWithLatestMetrics } from "@/lib/db/queries/posts";
 import { db } from "@/lib/db";
-import { styleRules } from "@/lib/db/schema";
+import { styleRules, scriptDiffs } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +20,12 @@ export default async function DashboardPage() {
     .from(styleRules)
     .where(eq(styleRules.status, "active"))
     .all();
+
+  const diffs = db.select().from(scriptDiffs).all();
+  const avgSurvival =
+    diffs.length > 0
+      ? Math.round(diffs.reduce((acc, d) => acc + d.survivalPercentage, 0) / diffs.length)
+      : null;
 
   return (
     <div className="space-y-8">
@@ -50,8 +56,12 @@ export default async function DashboardPage() {
             <Sparkles className="w-4 h-4 text-brand-emerald" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-mono text-slate-100">--</span>
-            <span className="text-xs text-slate-400 font-mono">awaiting scripts</span>
+            <span className="text-3xl font-bold font-mono text-slate-100">
+              {avgSurvival !== null ? `${avgSurvival}%` : "--"}
+            </span>
+            <span className="text-xs text-slate-400 font-mono">
+              {avgSurvival !== null ? `${diffs.length} finalized` : "awaiting scripts"}
+            </span>
           </div>
           <p className="text-xs text-slate-400 mt-2">Share of AI draft retained in final edits</p>
         </div>
