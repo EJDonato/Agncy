@@ -31,3 +31,7 @@ data/exports/
 # IDEs
 .vscode/
 .idea/
+
+# Scratch & temporary scripts
+scratch/
+

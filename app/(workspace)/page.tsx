@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { ArrowUpRight, Sparkles, TrendingUp, ShieldCheck, FileEdit, Plus } from "lucide-react";
+import { getPostsWithLatestMetrics } from "@/lib/db/queries/posts";
 
-export default function DashboardPage() {
+export const dynamic = "force-dynamic";
+
+export default async function DashboardPage() {
+  const posts = await getPostsWithLatestMetrics();
+  const reels = posts.filter((p) => p.postType === "Reel");
+  const topReel = reels.reduce(
+    (max, r) => (r.views > (max?.views ?? 0) ? r : max),
+    reels[0] || null
+  );
+
   return (
     <div className="space-y-8">
       {/* Welcome Banner */}
@@ -31,8 +41,8 @@ export default function DashboardPage() {
             <Sparkles className="w-4 h-4 text-brand-emerald" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-mono text-slate-100">76%</span>
-            <span className="text-xs text-brand-emerald font-mono">+14% vs avg</span>
+            <span className="text-3xl font-bold font-mono text-slate-100">--</span>
+            <span className="text-xs text-slate-400 font-mono">awaiting scripts</span>
           </div>
           <p className="text-xs text-slate-400 mt-2">Share of AI draft retained in final edits</p>
         </div>
@@ -43,10 +53,14 @@ export default function DashboardPage() {
             <TrendingUp className="w-4 h-4 text-brand-amber" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-mono text-slate-100">11.2s</span>
-            <span className="text-xs text-slate-400 font-mono">Top: 15.8k views</span>
+            <span className="text-3xl font-bold font-mono text-slate-100">
+              {topReel?.avgSecondsViewed ? `${topReel.avgSecondsViewed.toFixed(1)}s` : "--"}
+            </span>
+            <span className="text-xs text-slate-400 font-mono">
+              {topReel ? `Top: ${(topReel.views / 1000).toFixed(1)}k views` : "no data"}
+            </span>
           </div>
-          <p className="text-xs text-slate-400 mt-2">Civic question hooks outperform by 3.5x</p>
+          <p className="text-xs text-slate-400 mt-2">Calculated from imported Meta Reels</p>
         </div>
 
         <div className="p-5 rounded-xl border border-border-subtle bg-surface-raised">
@@ -55,22 +69,24 @@ export default function DashboardPage() {
             <ShieldCheck className="w-4 h-4 text-brand-amber" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-mono text-slate-100">5</span>
-            <span className="text-xs text-slate-400 font-mono">2 proposed</span>
+            <span className="text-3xl font-bold font-mono text-slate-100">3</span>
+            <span className="text-xs text-brand-emerald font-mono">active</span>
           </div>
-          <p className="text-xs text-slate-400 mt-2">Calibrated from recent script diffs</p>
+          <p className="text-xs text-slate-400 mt-2">Calibrated from brand voice directives</p>
         </div>
 
         <div className="p-5 rounded-xl border border-border-subtle bg-surface-raised">
           <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
-            <span>POSTS LINKED</span>
+            <span>POSTS RECORDED</span>
             <FileEdit className="w-4 h-4 text-brand-emerald" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-mono text-slate-100">85%</span>
-            <span className="text-xs text-slate-400 font-mono">19 imported</span>
+            <span className="text-3xl font-bold font-mono text-slate-100">{posts.length}</span>
+            <span className="text-xs text-brand-emerald font-mono">
+              {posts.length > 0 ? "live in SQLite" : "awaiting CSV"}
+            </span>
           </div>
-          <p className="text-xs text-slate-400 mt-2">Meta posts tied to origin scripts</p>
+          <p className="text-xs text-slate-400 mt-2">Meta posts imported into Brand Brain</p>
         </div>
       </div>
 
@@ -125,7 +141,9 @@ export default function DashboardPage() {
                 <span className="text-sm font-medium text-slate-200">Import Meta CSV</span>
                 <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-brand-amber transition-colors" />
               </div>
-              <p className="text-xs text-slate-400 mt-1">Drop latest Meta Business Suite export</p>
+              <p className="text-xs text-slate-400 mt-1">
+                {posts.length > 0 ? `${posts.length} posts recorded • Drop newer export` : "Drop Meta Business Suite export"}
+              </p>
             </Link>
 
             <Link
