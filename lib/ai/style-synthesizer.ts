@@ -11,6 +11,12 @@ export interface AnalyzeEditParams {
   survivalPercentage: number;
 }
 
+const CANDIDATE_MODELS = [
+  "gemini-3-flash-preview",
+  "gemini-3.5-flash-lite",
+  "gemini-3.1-flash-lite",
+];
+
 export async function analyzeEditAndSynthesizeStyle(params: AnalyzeEditParams): Promise<{
   editSummary: string;
   proposedRule?: {
@@ -50,15 +56,34 @@ Respond in JSON with this structure:
 
   try {
     const ai = getGeminiClient();
-    const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-      },
-    });
+    let rawJsonText = "";
 
-    const parsed = JSON.parse(response.text || "{}");
+    for (const model of CANDIDATE_MODELS) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+          },
+        });
+
+        if (response.text) {
+          rawJsonText = response.text;
+          break;
+        }
+      } catch (err) {
+        console.warn(`Model ${model} failed for style synthesis, trying fallback:`, err);
+      }
+    }
+
+    if (!rawJsonText) {
+      return {
+        editSummary: `Script finalized with ${survivalPercentage}% AI draft survival.`,
+      };
+    }
+
+    const parsed = JSON.parse(rawJsonText || "{}");
     const editSummary = parsed.editSummary || `Creator modified script (${survivalPercentage}% AI draft retained).`;
 
     if (parsed.proposedRule && parsed.proposedRule.ruleText) {

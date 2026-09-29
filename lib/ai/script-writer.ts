@@ -11,6 +11,12 @@ export interface GenerateScriptParams {
   targetDurationSec?: number;
 }
 
+const CANDIDATE_MODELS = [
+  "gemini-3-flash-preview",
+  "gemini-3.5-flash-lite",
+  "gemini-3.1-flash-lite",
+];
+
 export async function generateScriptDraft(params: GenerateScriptParams): Promise<{
   scriptId: string;
   draft: ScriptDraft;
@@ -59,7 +65,7 @@ CRITICAL RULES:
 ${rulesText}
 
 Generate a short-form video script (${format}, ~${targetDurationSec} seconds). Provide visual cues and spoken cues.
-Return ONLY valid JSON strictly matching the requested schema.`;
+Return ONLY valid JSON strictly matching the schema.`;
 
   const prompt = `Topic: "${topic}"
 Target Duration: ${targetDurationSec} seconds
@@ -68,36 +74,76 @@ ${pastScripts.length > 0 ? `Past Reference Scripts:\n${pastScripts.map((s) => s.
 
   const ai = getGeminiClient();
 
-  // Try gemini-2.5-pro first, fallback to gemini-1.5-pro
-  const modelName = "gemini-2.5-pro";
   let rawJsonText = "";
+  let lastError: unknown = null;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: prompt,
-      config: {
-        systemInstruction,
-        responseMimeType: "application/json",
-      },
-    });
+  for (const model of CANDIDATE_MODELS) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          systemInstruction,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              title: { type: "STRING" },
+              estimated_duration_sec: { type: "INTEGER" },
+              total_word_count: { type: "INTEGER" },
+              hook: {
+                type: "OBJECT",
+                properties: {
+                  visual_cue: { type: "STRING" },
+                  spoken_text: { type: "STRING" },
+                  duration_est_sec: { type: "INTEGER" },
+                },
+                required: ["visual_cue", "spoken_text", "duration_est_sec"],
+              },
+              body_beats: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    beat_number: { type: "INTEGER" },
+                    visual_cue: { type: "STRING" },
+                    spoken_text: { type: "STRING" },
+                    pacing: { type: "STRING", enum: ["rapid", "deliberate", "punchy"] },
+                  },
+                  required: ["beat_number", "visual_cue", "spoken_text", "pacing"],
+                },
+              },
+              cta: {
+                type: "OBJECT",
+                properties: {
+                  visual_cue: { type: "STRING" },
+                  spoken_text: { type: "STRING" },
+                },
+                required: ["visual_cue", "spoken_text"],
+              },
+            },
+            required: ["title", "estimated_duration_sec", "total_word_count", "hook", "body_beats", "cta"],
+          },
+        },
+      });
 
-    rawJsonText = response.text || "";
-  } catch {
-    // Fallback to gemini-1.5-pro or flash if 2.5-pro quota / preview varies
-    const fallbackResponse = await ai.models.generateContent({
-      model: "gemini-1.5-pro",
-      contents: prompt,
-      config: {
-        systemInstruction,
-        responseMimeType: "application/json",
-      },
-    });
-    rawJsonText = fallbackResponse.text || "";
+      if (response.text) {
+        rawJsonText = response.text;
+        break;
+      }
+    } catch (err) {
+      lastError = err;
+      console.warn(`Model ${model} failed, trying fallback:`, err);
+    }
+  }
+
+  if (!rawJsonText) {
+    throw lastError || new Error("Failed to generate script draft with Gemini");
   }
 
   const parsedJson = JSON.parse(rawJsonText);
-  const validatedDraft = ScriptDraftSchema.parse(parsedJson);
+  const dataToValidate = Array.isArray(parsedJson) ? parsedJson[0] : parsedJson;
+  const validatedDraft = ScriptDraftSchema.parse(dataToValidate);
   const markdownContent = formatScriptDraftToMarkdown(validatedDraft);
 
   const scriptId = `scr_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`;
@@ -107,7 +153,7 @@ ${pastScripts.length > 0 ? `Past Reference Scripts:\n${pastScripts.map((s) => s.
   db.transaction((tx) => {
     tx.insert(scripts).values({
       id: scriptId,
-      brandId: profile ? ("id" in profile && profile.id ? (profile.id as string) : "default_profile") : "default_profile",
+      brandId: profile && "id" in profile && profile.id ? (profile.id as string) : "default_profile",
       title: validatedDraft.title,
       format,
       targetDurationSec,
