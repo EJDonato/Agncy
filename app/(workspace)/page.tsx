@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ArrowUpRight, Sparkles, TrendingUp, ShieldCheck, FileEdit, Plus } from "lucide-react";
 import { getPostsWithLatestMetrics } from "@/lib/db/queries/posts";
+import { db } from "@/lib/db";
+import { styleRules } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +14,12 @@ export default async function DashboardPage() {
     (max, r) => (r.views > (max?.views ?? 0) ? r : max),
     reels[0] || null
   );
+
+  const activeRules = db
+    .select()
+    .from(styleRules)
+    .where(eq(styleRules.status, "active"))
+    .all();
 
   return (
     <div className="space-y-8">
@@ -69,8 +78,12 @@ export default async function DashboardPage() {
             <ShieldCheck className="w-4 h-4 text-brand-amber" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-mono text-slate-100">3</span>
-            <span className="text-xs text-brand-emerald font-mono">active</span>
+            <span className="text-3xl font-bold font-mono text-slate-100">
+              {activeRules.length > 0 ? activeRules.length : "--"}
+            </span>
+            <span className="text-xs text-slate-400 font-mono">
+              {activeRules.length > 0 ? "active" : "none active"}
+            </span>
           </div>
           <p className="text-xs text-slate-400 mt-2">Calibrated from brand voice directives</p>
         </div>

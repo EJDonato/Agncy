@@ -77,8 +77,10 @@ export function PostsTable({ posts }: Props) {
             <tbody className="divide-y divide-border-subtle">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-slate-500 font-mono">
-                    No posts matching the selected filter.
+                  <td colSpan={8} className="py-12 text-center text-slate-500 font-mono">
+                    {posts.length === 0
+                      ? "No posts imported yet. Drag and drop your Meta Business Suite CSV export above to populate your analytics."
+                      : "No posts matching the selected search or filter."}
                   </td>
                 </tr>
               ) : (

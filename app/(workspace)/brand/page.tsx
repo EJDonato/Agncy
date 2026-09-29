@@ -1,6 +1,19 @@
-import { BrainCircuit, Check, Shield } from "lucide-react";
+import { BrainCircuit, Check, Shield, Plus, Sparkles } from "lucide-react";
+import { db } from "@/lib/db";
+import { brandProfiles, styleRules } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 
 export default function BrandBrainPage() {
+  const profile = db.select().from(brandProfiles).limit(1).get();
+  const activeRules = db
+    .select()
+    .from(styleRules)
+    .where(eq(styleRules.status, "active"))
+    .all();
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -20,27 +33,37 @@ export default function BrandBrainPage() {
               <BrainCircuit className="w-4 h-4 text-brand-amber" />
               Creator Identity
             </h2>
-            <span className="text-xs font-mono text-brand-emerald">Synced</span>
+            <span className={`text-xs font-mono ${profile ? "text-brand-emerald" : "text-slate-500"}`}>
+              {profile ? "Synced" : "Not configured"}
+            </span>
           </div>
 
-          <div className="space-y-3 text-sm">
-            <div>
-              <span className="text-xs text-slate-400 block font-mono">CREATOR NAME</span>
-              <span className="text-slate-200">Elton</span>
+          {profile ? (
+            <div className="space-y-3 text-sm">
+              <div>
+                <span className="text-xs text-slate-400 block font-mono">CREATOR NAME</span>
+                <span className="text-slate-200">{profile.creatorName}</span>
+              </div>
+              <div>
+                <span className="text-xs text-slate-400 block font-mono">NICHE & TOPICS</span>
+                <span className="text-slate-200">{profile.niche}</span>
+              </div>
+              <div>
+                <span className="text-xs text-slate-400 block font-mono">LANGUAGE MIX</span>
+                <span className="text-slate-200">{profile.languageMix}</span>
+              </div>
+              <div>
+                <span className="text-xs text-slate-400 block font-mono">TONE</span>
+                <span className="text-slate-200">{profile.toneOfVoice}</span>
+              </div>
             </div>
-            <div>
-              <span className="text-xs text-slate-400 block font-mono">NICHE & TOPICS</span>
-              <span className="text-slate-200">Civic tech, grassroots community systems, open data</span>
+          ) : (
+            <div className="p-6 rounded-lg bg-surface-subtle/50 border border-border-subtle text-center space-y-2">
+              <p className="text-xs text-slate-400">
+                No brand profile configured yet. Set up your identity, language mix, and tone to seed Google Gemini.
+              </p>
             </div>
-            <div>
-              <span className="text-xs text-slate-400 block font-mono">LANGUAGE MIX</span>
-              <span className="text-slate-200">Conversational Taglish (Filipino/English)</span>
-            </div>
-            <div>
-              <span className="text-xs text-slate-400 block font-mono">TONE</span>
-              <span className="text-slate-200">Direct, empathetic, grounded, analytical. No cringe hype.</span>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Active Style Rules Card */}
@@ -50,21 +73,27 @@ export default function BrandBrainPage() {
               <Shield className="w-4 h-4 text-brand-amber" />
               Active Style Rules
             </h2>
-            <span className="text-xs font-mono text-slate-400">3 Injected</span>
+            <span className="text-xs font-mono text-slate-400">
+              {activeRules.length > 0 ? `${activeRules.length} Injected` : "0 Injected"}
+            </span>
           </div>
 
-          <div className="space-y-2">
-            {[
-              "Hook must be under 8 words and present a paradox.",
-              "Use conversational Taglish particles (kasi, naman, talaga).",
-              "Never use generic greetings like 'Hey guys' or 'Kumusta'.",
-            ].map((rule, idx) => (
-              <div key={idx} className="p-3 rounded-lg bg-surface-subtle border border-border-subtle flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-brand-emerald mt-0.5 shrink-0" />
-                <span className="text-xs text-slate-200 font-mono">{rule}</span>
-              </div>
-            ))}
-          </div>
+          {activeRules.length > 0 ? (
+            <div className="space-y-2">
+              {activeRules.map((rule) => (
+                <div key={rule.id} className="p-3 rounded-lg bg-surface-subtle border border-border-subtle flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-brand-emerald mt-0.5 shrink-0" />
+                  <span className="text-xs text-slate-200 font-mono">{rule.ruleText}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-6 rounded-lg bg-surface-subtle/50 border border-border-subtle text-center space-y-2">
+              <p className="text-xs text-slate-400">
+                No active style rules yet. As you edit script drafts, Agncy will synthesize your style patterns and propose rules for you to approve.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
