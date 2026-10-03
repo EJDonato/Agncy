@@ -4,6 +4,7 @@ import { getPostsWithLatestMetrics } from "@/lib/db/queries/posts";
 import { db } from "@/lib/db";
 import { styleRules, scripts } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { GEMINI_SCRIPT_MODEL_LABEL } from "@/lib/ai/models";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +35,7 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-100">Studio Cockpit</h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Brand Brain active • Google Gemini 2.5 Pro & Flash connected • Local SQLite WAL enabled
+            Brand Brain active • {GEMINI_SCRIPT_MODEL_LABEL} connected • Local SQLite WAL enabled
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -123,7 +124,7 @@ export default async function DashboardPage() {
               <p className="text-xs text-slate-400">Generate a short-form video draft using your Brand Brain & verified style rules.</p>
             </div>
             <span className="text-xs font-mono px-2 py-0.5 rounded bg-surface-subtle border border-border-strong text-slate-300 self-start sm:self-center">
-              Gemini 2.5 Pro
+              {GEMINI_SCRIPT_MODEL_LABEL}
             </span>
           </div>
 

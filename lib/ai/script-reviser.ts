@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { brandProfiles, styleRules } from "@/lib/db/schema";
 import { getGeminiClient } from "./gemini";
-import { GEMINI_FLASH_MODELS } from "./models";
+import { GEMINI_SCRIPT_MODELS } from "./models";
 import { ScriptDraftResponseSchema, ScriptDraftSchema, formatScriptDraftToMarkdown } from "./schemas";
 
 interface ReviseScriptParams {
@@ -46,7 +46,7 @@ Apply the user's instruction precisely. Always return a structured script with a
   const ai = getGeminiClient();
   let lastError: unknown;
 
-  for (const model of GEMINI_FLASH_MODELS) {
+  for (const model of GEMINI_SCRIPT_MODELS) {
     try {
       const response = await withTimeout(ai.models.generateContent({
         model,

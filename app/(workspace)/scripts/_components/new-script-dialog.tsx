@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Sparkles, Plus, X, Loader2 } from "lucide-react";
 import { createScriptDraftAction } from "@/lib/actions/scripts";
 import { useRouter } from "next/navigation";
+import { GEMINI_SCRIPT_MODEL_LABEL } from "@/lib/ai/models";
 
 export function NewScriptDialog() {
   const [isOpen, setIsOpen] = useState(false);
@@ -152,7 +153,7 @@ export function NewScriptDialog() {
                   {isGenerating ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Writing with Gemini 2.5 Pro...</span>
+                      <span>Writing with {GEMINI_SCRIPT_MODEL_LABEL}...</span>
                     </>
                   ) : (
                     <>

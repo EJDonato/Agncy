@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { ScriptDraftResponseSchema, ScriptDraftSchema, formatScriptDraftToMarkdown, type ScriptDraft } from "./schemas";
 import { buildFewShotContext } from "./few-shot-context";
 import crypto from "node:crypto";
-import { GEMINI_FLASH_MODELS } from "./models";
+import { GEMINI_SCRIPT_MODELS } from "./models";
 
 export interface GenerateScriptParams {
   topic: string;
@@ -62,7 +62,7 @@ ${fewShotContext ? `Use these recent finalized scripts only as writing-style ref
   let rawJsonText = "";
   let lastError: unknown = null;
 
-  for (const model of GEMINI_FLASH_MODELS) {
+  for (const model of GEMINI_SCRIPT_MODELS) {
     try {
       const response = await ai.models.generateContent({
         model,

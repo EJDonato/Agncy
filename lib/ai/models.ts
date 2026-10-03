@@ -1,5 +1,7 @@
-export const GEMINI_FLASH_MODELS = [
-  "gemini-3-flash-preview",
-  "gemini-3.5-flash-lite",
-  "gemini-3.1-flash-lite",
+export const GEMINI_SCRIPT_MODELS = [
+  "gemini-3.1-pro-preview",
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
 ] as const;
+
+export const GEMINI_SCRIPT_MODEL_LABEL = "Gemini 3.1 Pro";
