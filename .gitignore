@@ -35,3 +35,4 @@ data/exports/
 # Scratch & temporary scripts
 scratch/
 
+.playwright-mcp
