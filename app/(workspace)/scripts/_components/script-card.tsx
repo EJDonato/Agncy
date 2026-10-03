@@ -1,19 +1,8 @@
 import Link from "next/link";
-import { Clock, Film, Activity, ChevronRight } from "lucide-react";
+import { Clock, Film, ChevronRight } from "lucide-react";
 import type { ScriptListItem } from "@/lib/db/queries/scripts";
 
 export function ScriptCard({ script }: { script: ScriptListItem }) {
-  const survivalRate = script.survivalPercentage;
-
-  const survivalColor =
-    survivalRate === null
-      ? "text-slate-400 border-border-subtle"
-      : survivalRate >= 70
-      ? "text-brand-emerald border-brand-emerald/30 bg-brand-emerald/10"
-      : survivalRate >= 45
-      ? "text-brand-amber border-brand-amber/30 bg-brand-amber/10"
-      : "text-brand-rose border-brand-rose/30 bg-brand-rose/10";
-
   return (
     <Link
       href={`/scripts/${script.id}`}
@@ -60,18 +49,7 @@ export function ScriptCard({ script }: { script: ScriptListItem }) {
           </p>
         </div>
 
-        <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-1 sm:pt-0 border-t border-border-subtle/50 sm:border-t-0">
-          {survivalRate !== null ? (
-            <div className={`px-2.5 py-1 rounded-md border text-xs font-mono font-medium flex items-center gap-1.5 ${survivalColor}`}>
-              <Activity className="w-3.5 h-3.5" />
-              <span>{survivalRate}% Survival</span>
-            </div>
-          ) : (
-            <span className="text-[11px] font-mono text-slate-400 px-2 py-1">
-              Draft Pending
-            </span>
-          )}
-
+        <div className="flex items-center justify-end shrink-0">
           <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-brand-amber group-hover:translate-x-0.5 transition-all" />
         </div>
       </div>

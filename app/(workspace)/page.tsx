@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, Sparkles, TrendingUp, ShieldCheck, FileEdit, Plus } from "lucide-react";
 import { getPostsWithLatestMetrics } from "@/lib/db/queries/posts";
 import { db } from "@/lib/db";
-import { styleRules, scriptDiffs } from "@/lib/db/schema";
+import { styleRules, scripts } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
@@ -21,11 +21,11 @@ export default async function DashboardPage() {
     .where(eq(styleRules.status, "active"))
     .all();
 
-  const diffs = db.select().from(scriptDiffs).all();
-  const avgSurvival =
-    diffs.length > 0
-      ? Math.round(diffs.reduce((acc, d) => acc + d.survivalPercentage, 0) / diffs.length)
-      : null;
+  const finalizedScripts = db
+    .select({ id: scripts.id })
+    .from(scripts)
+    .where(eq(scripts.status, "finalized"))
+    .all();
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -52,18 +52,18 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 sm:p-5 rounded-xl border border-border-subtle bg-surface-raised">
           <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
-            <span>DRAFT SURVIVAL</span>
+            <span>WRITING REFERENCES</span>
             <Sparkles className="w-4 h-4 text-brand-emerald" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-bold font-mono text-slate-100">
-              {avgSurvival !== null ? `${avgSurvival}%` : "--"}
+              {Math.min(finalizedScripts.length, 3)}
             </span>
             <span className="text-xs text-slate-400 font-mono">
-              {avgSurvival !== null ? `${diffs.length} finalized` : "awaiting scripts"}
+              {Math.min(finalizedScripts.length, 3) === 1 ? "script" : "scripts"}
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-2">Share of AI draft retained in final edits</p>
+          <p className="text-xs text-slate-400 mt-2">Up to 3 recent finals guide structure and wording</p>
         </div>
 
         <div className="p-4 sm:p-5 rounded-xl border border-border-subtle bg-surface-raised">
@@ -193,7 +193,7 @@ export default async function DashboardPage() {
                 <span className="text-sm font-medium text-slate-200">Review Style Rules</span>
                 <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-brand-amber transition-colors" />
               </div>
-              <p className="text-xs text-slate-400 mt-1">Approve learned patterns from your edits</p>
+              <p className="text-xs text-slate-400 mt-1">Manage the writing preferences Gemini should follow</p>
             </Link>
           </div>
         </div>

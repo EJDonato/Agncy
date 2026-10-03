@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { scripts, scriptVersions, scriptDiffs } from "@/lib/db/schema";
+import { scripts, scriptVersions } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 
 export interface ScriptListItem {
@@ -9,7 +9,6 @@ export interface ScriptListItem {
   targetDurationSec: number | null;
   status: string;
   createdAt: string | null;
-  survivalPercentage: number | null;
 }
 
 export function getScriptsList(): ScriptListItem[] {
@@ -19,23 +18,14 @@ export function getScriptsList(): ScriptListItem[] {
     .orderBy(desc(scripts.createdAt))
     .all();
 
-  return allScripts.map((s) => {
-    const diff = db
-      .select()
-      .from(scriptDiffs)
-      .where(eq(scriptDiffs.scriptId, s.id))
-      .get();
-
-    return {
+  return allScripts.map((s) => ({
       id: s.id,
       title: s.title,
       format: s.format,
       targetDurationSec: s.targetDurationSec,
       status: s.status,
       createdAt: s.createdAt,
-      survivalPercentage: diff ? diff.survivalPercentage : null,
-    };
-  });
+    }));
 }
 
 export function getScriptWithVersions(scriptId: string) {
@@ -54,12 +44,6 @@ export function getScriptWithVersions(scriptId: string) {
     .orderBy(desc(scriptVersions.versionNumber))
     .all();
 
-  const diff = db
-    .select()
-    .from(scriptDiffs)
-    .where(eq(scriptDiffs.scriptId, scriptId))
-    .get();
-
   const initialDraft = versions.find((v) => v.versionType === "ai_initial_draft") || versions[versions.length - 1];
   const latestAiVersion = versions.find((v) =>
     v.versionType === "ai_revision" || v.versionType === "ai_initial_draft"
@@ -69,7 +53,6 @@ export function getScriptWithVersions(scriptId: string) {
   return {
     script,
     versions,
-    diff,
     initialDraft,
     latestAiVersion,
     latestEditable,

@@ -32,7 +32,7 @@ export async function generateScriptDraft(params: GenerateScriptParams): Promise
     .where(eq(styleRules.status, "active"))
     .all();
 
-  const fewShotContext = await buildFewShotContext(topic);
+  const fewShotContext = buildFewShotContext();
 
   const rulesText =
     activeRules.length > 0
@@ -55,7 +55,7 @@ Return ONLY valid JSON strictly matching the schema.`;
   const prompt = `Topic: "${topic}"
 Target Duration: ${targetDurationSec} seconds
 Format: ${format}
-${fewShotContext ? `Use these successful draft-to-final pairs as style examples:\n\n${fewShotContext}` : ""}`;
+${fewShotContext ? `Use these recent finalized scripts only as writing-style references. Match their structure, rhythm, transitions, vocabulary, and language mix. Do not copy their topics or factual claims.\n\n${fewShotContext}` : ""}`;
 
   const ai = getGeminiClient();
 

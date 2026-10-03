@@ -20,6 +20,7 @@ export function StyleRulesManager({ rules }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newRuleText, setNewRuleText] = useState("");
   const [category, setCategory] = useState<"hook" | "pacing" | "vocabulary" | "structure" | "tone">("hook");
+  const [error, setError] = useState<string | null>(null);
 
   const proposedRules = rules.filter((r) => r.status === "proposed");
   const activeRules = rules.filter((r) => r.status === "active");
@@ -29,6 +30,7 @@ export function StyleRulesManager({ rules }: Props) {
     if (!newRuleText.trim()) return;
 
     setIsSubmitting(true);
+    setError(null);
     const formData = new FormData();
     formData.append("ruleText", newRuleText);
     formData.append("category", category);
@@ -36,6 +38,8 @@ export function StyleRulesManager({ rules }: Props) {
     try {
       await createManualRuleAction(formData);
       setNewRuleText("");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to add style rule");
     } finally {
       setIsSubmitting(false);
     }
@@ -49,7 +53,7 @@ export function StyleRulesManager({ rules }: Props) {
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-brand-amber flex items-center gap-2 text-sm">
               <Sparkles className="w-4 h-4 shrink-0" />
-              <span>Proposed Rules Synthesized from Your Edits</span>
+              <span>Proposed Rules Awaiting Review</span>
             </h3>
             <span className="text-xs font-mono text-slate-400">{proposedRules.length} pending</span>
           </div>
@@ -74,7 +78,7 @@ export function StyleRulesManager({ rules }: Props) {
 
         {activeRules.length === 0 ? (
           <p className="text-xs text-slate-400 py-3 text-center font-mono">
-            No style rules active yet. Add a rule below or edit AI scripts to synthesize rules automatically.
+            No style rules active yet. Add an explicit writing preference below.
           </p>
         ) : (
           <div className="space-y-2">
@@ -92,6 +96,15 @@ export function StyleRulesManager({ rules }: Props) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {error && (
+          <div 
+            role="alert"
+            className="p-3 rounded-lg bg-brand-rose/10 border border-brand-rose/30 text-brand-rose text-xs font-mono"
+          >
+            {error}
           </div>
         )}
 

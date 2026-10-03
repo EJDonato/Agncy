@@ -25,7 +25,6 @@ export default async function ScriptDetailPage({ params }: ScriptPageProps) {
       }}
       baselineText={data.latestAiVersion?.fullContent || ""}
       initialContent={data.latestEditable?.fullContent || ""}
-      initialEditSummary={data.diff?.editSummary || null}
     />
   );
 }

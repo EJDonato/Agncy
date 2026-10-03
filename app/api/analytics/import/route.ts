@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { importMetaCsvFile } from "@/lib/analytics/importer";
 import { revalidatePath } from "next/cache";
 
+const MAX_CSV_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -18,6 +20,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: "Only .csv files are supported." },
         { status: 400 }
+      );
+    }
+
+    if (file.size === 0) {
+      return NextResponse.json(
+        { success: false, error: "The uploaded CSV file is empty (0 bytes)." },
+        { status: 400 }
+      );
+    }
+
+    if (file.size > MAX_CSV_SIZE_BYTES) {
+      return NextResponse.json(
+        { success: false, error: "File exceeds the 25MB maximum size limit." },
+        { status: 413 }
       );
     }
 

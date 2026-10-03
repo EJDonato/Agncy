@@ -12,7 +12,7 @@ export default function ScriptsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-100">Script Studio</h1>
           <p className="text-sm text-slate-400 mt-1">
-            AI-drafted short-form video scripts with token-level survival diffing.
+            AI-assisted scripts shaped by your most recently finalized work.
           </p>
         </div>
         <NewScriptDialog />
@@ -25,7 +25,7 @@ export default function ScriptsPage() {
           </div>
           <h2 className="text-base font-semibold text-slate-200">No Scripts Created Yet</h2>
           <p className="text-xs text-slate-400 max-w-md mx-auto">
-            Generate your first Reel script draft from a topic. As you edit the draft, Agncy measures draft survival and synthesizes your style profile.
+            Generate your first Reel script from a topic. Each finalized script becomes a writing reference for future drafts.
           </p>
           <div className="pt-2">
             <NewScriptDialog />

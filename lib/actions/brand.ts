@@ -109,13 +109,25 @@ export async function createManualRuleAction(formData: FormData) {
   }
 
   const existingProfile = db.select().from(brandProfiles).limit(1).get();
-  if (!existingProfile) {
-    throw new Error("Save your Brand Brain profile before adding style rules.");
+  let brandId = existingProfile?.id;
+  if (!brandId) {
+    brandId = `bp_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`;
+    db.insert(brandProfiles)
+      .values({
+        id: brandId,
+        creatorName: "Elton",
+        niche: "Civic tech, grassroots community apps, public interest technology",
+        targetAudience: "Filipino youth developers, civic organizers, local community builders",
+        toneOfVoice: "Direct, grounded, empathetic, analytical. No cringe hype or generic buzzwords.",
+        languageMix: "Taglish (Filipino/English)",
+        dosAndDonts: "Never start with 'Hey guys'. Start directly at the paradox or friction.",
+      })
+      .run();
   }
 
   db.insert(styleRules).values({
     id: `rule_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`,
-    brandId: existingProfile.id,
+    brandId,
     category,
     ruleText: ruleText.trim(),
     rationale: "Manually created by creator",

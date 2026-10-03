@@ -1,11 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Loader2, RotateCcw, Save, Send, Sparkles } from "lucide-react";
 import { reviseScriptWithPromptAction, saveFinalScriptVersionAction } from "@/lib/actions/scripts";
-import { computeScriptDiff } from "@/lib/diff/lcs";
-import { SurvivalMeter } from "./survival-meter";
 
 interface SingleScriptEditorProps {
   script: {
@@ -17,25 +15,21 @@ interface SingleScriptEditorProps {
   };
   baselineText: string;
   initialContent: string;
-  initialEditSummary: string | null;
 }
 
 export function SingleScriptEditor({
   script,
   baselineText,
   initialContent,
-  initialEditSummary,
 }: SingleScriptEditorProps) {
   const [content, setContent] = useState(initialContent || baselineText);
   const [aiBaseline, setAiBaseline] = useState(baselineText);
   const [instruction, setInstruction] = useState("");
-  const [revisionInstructions, setRevisionInstructions] = useState<string[]>([]);
   const [isRevising, setIsRevising] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [editSummary, setEditSummary] = useState(initialEditSummary);
-  const diff = useMemo(() => computeScriptDiff(aiBaseline, content), [aiBaseline, content]);
+  const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
 
   async function handleRevision(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -52,9 +46,7 @@ export function SingleScriptEditor({
       });
       setContent(result.revisedContent);
       setAiBaseline(result.revisedContent);
-      setRevisionInstructions((current) => [...current, prompt].slice(-5));
       setInstruction("");
-      setEditSummary(null);
     } catch (revisionError) {
       setError(revisionError instanceof Error ? revisionError.message : "Gemini could not revise the script.");
     } finally {
@@ -67,13 +59,10 @@ export function SingleScriptEditor({
     setError(null);
     setSavedSuccess(false);
     try {
-      const result = await saveFinalScriptVersionAction({
+      await saveFinalScriptVersionAction({
         scriptId: script.id,
         finalContent: content,
-        revisionInstructions,
       });
-      setEditSummary(result.editSummary);
-      setRevisionInstructions([]);
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 5000);
     } catch (saveError) {
@@ -100,7 +89,7 @@ export function SingleScriptEditor({
               <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-surface-subtle text-slate-400 border border-border-subtle">{script.format || "Reel"}</span>
               {script.targetDurationSec && <span className="text-[11px] font-mono text-slate-400">~{script.targetDurationSec}s</span>}
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">Edit directly or instruct Gemini. Saving analyzes your choices for future drafts.</p>
+            <p className="text-xs text-slate-400 mt-0.5">Edit directly or instruct Gemini. Saved scripts become context for future drafts.</p>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
@@ -151,7 +140,7 @@ export function SingleScriptEditor({
       {savedSuccess && (
         <div role="status" aria-live="polite" className="p-3.5 rounded-lg bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald text-xs font-mono flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>Script saved. Your edits and revision prompts were analyzed for future drafts.</span>
+          <span>Script saved. Gemini will use it as a writing reference for future drafts.</span>
         </div>
       )}
       {error && (
@@ -160,24 +149,10 @@ export function SingleScriptEditor({
         </div>
       )}
 
-      <SurvivalMeter 
-        survivalPercentage={diff.survivalPercentage} 
-        draftWordCount={diff.draftWordCount} 
-        finalWordCount={diff.finalWordCount} 
-        retainedWordCount={diff.retainedWordCount} 
-      />
-
-      {editSummary && (
-        <div className="rounded-lg border border-border-subtle bg-surface-raised px-4 py-3 text-xs text-slate-300">
-          <span className="font-mono text-brand-amber mr-2">LEARNED FROM THIS SAVE</span>
-          {editSummary}
-        </div>
-      )}
-
       <section className="rounded-xl border border-border-subtle bg-surface-raised overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle bg-surface-subtle/50 text-xs font-mono">
           <span className="font-semibold text-slate-300">SCRIPT</span>
-          <span className="text-slate-400">{diff.finalWordCount} words</span>
+          <span className="text-slate-400">{wordCount} words</span>
         </div>
         <textarea 
           value={content} 
