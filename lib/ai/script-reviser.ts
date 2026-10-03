@@ -1,13 +1,9 @@
 import { eq } from "drizzle-orm";
-import { z } from "zod";
 import { db } from "@/lib/db";
 import { brandProfiles, styleRules } from "@/lib/db/schema";
 import { getGeminiClient } from "./gemini";
 import { GEMINI_FLASH_MODELS } from "./models";
-
-const RevisionResponseSchema = z.object({
-  revised_content: z.string().min(1),
-});
+import { ScriptDraftResponseSchema, ScriptDraftSchema, formatScriptDraftToMarkdown } from "./schemas";
 
 interface ReviseScriptParams {
   currentContent: string;
@@ -45,7 +41,7 @@ Guardrails: ${profile.dosAndDonts || "None"}
 Active style rules:
 ${rules}
 
-Apply the user's instruction precisely. Preserve useful markdown structure and return the complete revised script, not commentary.`;
+Apply the user's instruction precisely. Always return a structured script with a hook, separate body beats, visual cues, pacing, and CTA. Never collapse the script into one paragraph.`;
   const prompt = `USER INSTRUCTION:\n${params.instruction}\n\nCURRENT SCRIPT:\n${params.currentContent}`;
   const ai = getGeminiClient();
   let lastError: unknown;
@@ -58,15 +54,12 @@ Apply the user's instruction precisely. Preserve useful markdown structure and r
         config: {
           systemInstruction,
           responseMimeType: "application/json",
-          responseSchema: {
-            type: "OBJECT",
-            properties: { revised_content: { type: "STRING" } },
-            required: ["revised_content"],
-          },
+          responseSchema: ScriptDraftResponseSchema,
         },
       }));
       if (response.text) {
-        return RevisionResponseSchema.parse(JSON.parse(response.text)).revised_content;
+        const revisedDraft = ScriptDraftSchema.parse(JSON.parse(response.text));
+        return formatScriptDraftToMarkdown(revisedDraft);
       }
     } catch (error) {
       lastError = error;

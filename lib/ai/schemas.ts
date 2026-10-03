@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Type, type Schema } from "@google/genai";
 
 export const ScriptDraftSchema = z.object({
   title: z.string().min(1),
@@ -24,6 +25,46 @@ export const ScriptDraftSchema = z.object({
 });
 
 export type ScriptDraft = z.infer<typeof ScriptDraftSchema>;
+
+export const ScriptDraftResponseSchema: Schema = {
+  type: Type.OBJECT,
+  properties: {
+    title: { type: Type.STRING },
+    estimated_duration_sec: { type: Type.INTEGER },
+    total_word_count: { type: Type.INTEGER },
+    hook: {
+      type: Type.OBJECT,
+      properties: {
+        visual_cue: { type: Type.STRING },
+        spoken_text: { type: Type.STRING },
+        duration_est_sec: { type: Type.NUMBER },
+      },
+      required: ["visual_cue", "spoken_text", "duration_est_sec"],
+    },
+    body_beats: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          beat_number: { type: Type.NUMBER },
+          visual_cue: { type: Type.STRING },
+          spoken_text: { type: Type.STRING },
+          pacing: { type: Type.STRING, enum: ["rapid", "deliberate", "punchy"] },
+        },
+        required: ["beat_number", "visual_cue", "spoken_text", "pacing"],
+      },
+    },
+    cta: {
+      type: Type.OBJECT,
+      properties: {
+        visual_cue: { type: Type.STRING },
+        spoken_text: { type: Type.STRING },
+      },
+      required: ["visual_cue", "spoken_text"],
+    },
+  },
+  required: ["title", "estimated_duration_sec", "total_word_count", "hook", "body_beats", "cta"],
+};
 
 export function formatScriptDraftToMarkdown(draft: ScriptDraft): string {
   const lines: string[] = [];

@@ -2,7 +2,7 @@ import { getGeminiClient } from "./gemini";
 import { db } from "@/lib/db";
 import { brandProfiles, styleRules, scripts, scriptVersions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { ScriptDraftSchema, formatScriptDraftToMarkdown, type ScriptDraft } from "./schemas";
+import { ScriptDraftResponseSchema, ScriptDraftSchema, formatScriptDraftToMarkdown, type ScriptDraft } from "./schemas";
 import { buildFewShotContext } from "./few-shot-context";
 import crypto from "node:crypto";
 import { GEMINI_FLASH_MODELS } from "./models";
@@ -70,45 +70,7 @@ ${fewShotContext ? `Use these successful draft-to-final pairs as style examples:
         config: {
           systemInstruction,
           responseMimeType: "application/json",
-          responseSchema: {
-            type: "OBJECT",
-            properties: {
-              title: { type: "STRING" },
-              estimated_duration_sec: { type: "INTEGER" },
-              total_word_count: { type: "INTEGER" },
-              hook: {
-                type: "OBJECT",
-                properties: {
-                  visual_cue: { type: "STRING" },
-                  spoken_text: { type: "STRING" },
-                  duration_est_sec: { type: "INTEGER" },
-                },
-                required: ["visual_cue", "spoken_text", "duration_est_sec"],
-              },
-              body_beats: {
-                type: "ARRAY",
-                items: {
-                  type: "OBJECT",
-                  properties: {
-                    beat_number: { type: "INTEGER" },
-                    visual_cue: { type: "STRING" },
-                    spoken_text: { type: "STRING" },
-                    pacing: { type: "STRING", enum: ["rapid", "deliberate", "punchy"] },
-                  },
-                  required: ["beat_number", "visual_cue", "spoken_text", "pacing"],
-                },
-              },
-              cta: {
-                type: "OBJECT",
-                properties: {
-                  visual_cue: { type: "STRING" },
-                  spoken_text: { type: "STRING" },
-                },
-                required: ["visual_cue", "spoken_text"],
-              },
-            },
-            required: ["title", "estimated_duration_sec", "total_word_count", "hook", "body_beats", "cta"],
-          },
+          responseSchema: ScriptDraftResponseSchema,
         },
       });
 
