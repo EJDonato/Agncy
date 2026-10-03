@@ -1,8 +1,9 @@
 import { eq } from "drizzle-orm";
+import { ThinkingLevel } from "@google/genai";
 import { db } from "@/lib/db";
 import { brandProfiles, styleRules } from "@/lib/db/schema";
 import { getGeminiClient } from "./gemini";
-import { GEMINI_SCRIPT_MODELS } from "./models";
+import { GEMINI_REVISION_MODELS } from "./models";
 import { ScriptDraftResponseSchema, ScriptDraftSchema, formatScriptDraftToMarkdown } from "./schemas";
 
 interface ReviseScriptParams {
@@ -10,18 +11,23 @@ interface ReviseScriptParams {
   instruction: string;
 }
 
-async function withTimeout<T>(promise: Promise<T>): Promise<T> {
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
       promise,
       new Promise<T>((_, reject) => {
-        timer = setTimeout(() => reject(new Error("Script revision timed out")), 45_000);
+        timer = setTimeout(() => reject(new Error("Script revision timed out")), timeoutMs);
       }),
     ]);
   } finally {
     if (timer) clearTimeout(timer);
   }
+}
+
+function getApiStatus(error: unknown): number | undefined {
+  if (typeof error !== "object" || error === null || !("status" in error)) return undefined;
+  return typeof error.status === "number" ? error.status : undefined;
 }
 
 export async function reviseScript(params: ReviseScriptParams): Promise<string> {
@@ -46,17 +52,18 @@ Apply the user's instruction precisely. Always return a structured script with a
   const ai = getGeminiClient();
   let lastError: unknown;
 
-  for (const model of GEMINI_SCRIPT_MODELS) {
+  for (const model of GEMINI_REVISION_MODELS) {
     try {
       const response = await withTimeout(ai.models.generateContent({
         model,
         contents: prompt,
         config: {
           systemInstruction,
+          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
           responseMimeType: "application/json",
           responseSchema: ScriptDraftResponseSchema,
         },
-      }));
+      }), 90_000);
       if (response.text) {
         const revisedDraft = ScriptDraftSchema.parse(JSON.parse(response.text));
         return formatScriptDraftToMarkdown(revisedDraft);
@@ -67,5 +74,9 @@ Apply the user's instruction precisely. Always return a structured script with a
     }
   }
 
+  const status = getApiStatus(lastError);
+  if (status === 429 || status === 503) {
+    throw new Error("Gemini is busy right now. Please try the revision again in a minute.");
+  }
   throw lastError instanceof Error ? lastError : new Error("Gemini could not revise the script.");
 }

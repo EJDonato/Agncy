@@ -3,19 +3,25 @@ import { getScriptsList } from "@/lib/db/queries/scripts";
 import { NewScriptDialog } from "./_components/new-script-dialog";
 import { ScriptCard } from "./_components/script-card";
 
-export default function ScriptsPage() {
+interface ScriptsPageProps {
+  searchParams?: Promise<{ topic?: string }>;
+}
+
+export default async function ScriptsPage({ searchParams }: ScriptsPageProps) {
+  const resolvedParams = searchParams ? await searchParams : {};
+  const topic = resolvedParams.topic || "";
   const scriptList = getScriptsList();
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-100">Script Studio</h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-100">Script Studio</h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
             AI-assisted scripts shaped by your most recently finalized work.
           </p>
         </div>
-        <NewScriptDialog />
+        <NewScriptDialog initialTopic={topic} />
       </div>
 
       {scriptList.length === 0 ? (
@@ -28,7 +34,7 @@ export default function ScriptsPage() {
             Generate your first Reel script from a topic. Each finalized script becomes a writing reference for future drafts.
           </p>
           <div className="pt-2">
-            <NewScriptDialog />
+            <NewScriptDialog initialTopic={topic} />
           </div>
         </div>
       ) : (

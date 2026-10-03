@@ -4,13 +4,25 @@ import { useState, useEffect } from "react";
 import { Sparkles, Plus, X, Loader2 } from "lucide-react";
 import { createScriptDraftAction } from "@/lib/actions/scripts";
 import { useRouter } from "next/navigation";
-import { GEMINI_SCRIPT_MODEL_LABEL } from "@/lib/ai/models";
 
-export function NewScriptDialog() {
-  const [isOpen, setIsOpen] = useState(false);
+interface NewScriptDialogProps {
+  initialTopic?: string;
+  defaultOpen?: boolean;
+}
+
+export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewScriptDialogProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen || Boolean(initialTopic));
+  const [topic, setTopic] = useState(initialTopic);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (initialTopic) {
+      setTopic(initialTopic);
+      setIsOpen(true);
+    }
+  }, [initialTopic]);
 
   // Escape key handler
   useEffect(() => {
@@ -89,6 +101,8 @@ export function NewScriptDialog() {
                 <textarea
                   id="script-topic-input"
                   name="topic"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
                   required
                   rows={3}
                   placeholder="e.g. Bakit nagiging ghost town ang civic apps kahit may funding?"
@@ -147,13 +161,13 @@ export function NewScriptDialog() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isGenerating}
+                  disabled={isGenerating || topic.trim().length < 3}
                   className="min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-brand-amber text-slate-950 font-semibold text-xs hover:bg-brand-amber/90 transition-colors disabled:opacity-50"
                 >
                   {isGenerating ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Writing with {GEMINI_SCRIPT_MODEL_LABEL}...</span>
+                      <span>Writing with Gemini...</span>
                     </>
                   ) : (
                     <>

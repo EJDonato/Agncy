@@ -7,11 +7,27 @@
   --foreground: #f8fafc;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
+}
+
+/* Polished input caret color matching studio amber */
+input, textarea {
+  caret-color: #F59E0B;
+}
+
+/* Accessible focus ring default for keyboard navigation */
+:focus-visible {
+  outline: 2px solid #F59E0B;
+  outline-offset: 2px;
 }
 
 /* Custom Scrollbars for High-Density Studio View */
