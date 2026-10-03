@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { importBatches, posts, postMetricSnapshots } from "@/lib/db/schema";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export interface PostWithLatestMetrics {
   id: string;
@@ -35,39 +35,45 @@ export interface PostSnapshot {
 }
 
 export async function getPostsWithLatestMetrics(): Promise<PostWithLatestMetrics[]> {
-  const allPosts = await db
+  const allPosts = db
     .select()
     .from(posts)
     .orderBy(desc(posts.publishedAt))
     .all();
 
-  const results: PostWithLatestMetrics[] = [];
+  const allSnapshots = db
+    .select({
+      id: postMetricSnapshots.id,
+      postId: postMetricSnapshots.postId,
+      views: postMetricSnapshots.views,
+      viewers: postMetricSnapshots.viewers,
+      interactions: postMetricSnapshots.interactions,
+      reactions: postMetricSnapshots.reactions,
+      comments: postMetricSnapshots.comments,
+      shares: postMetricSnapshots.shares,
+      saves: postMetricSnapshots.saves,
+      avgSecondsViewed: postMetricSnapshots.avgSecondsViewed,
+      distributionScore: postMetricSnapshots.distributionScore,
+      capturedAt: postMetricSnapshots.capturedAt,
+      fileName: importBatches.fileName,
+    })
+    .from(postMetricSnapshots)
+    .innerJoin(importBatches, eq(postMetricSnapshots.batchId, importBatches.id))
+    .orderBy(desc(postMetricSnapshots.capturedAt), desc(postMetricSnapshots.id))
+    .all();
 
-  for (const post of allPosts) {
-    const latestSnapshot = await db
-      .select()
-      .from(postMetricSnapshots)
-      .where(eq(postMetricSnapshots.postId, post.id))
-      .orderBy(desc(postMetricSnapshots.capturedAt), sql`rowid DESC`)
-      .limit(1)
-      .get();
+  const snapshotsByPostId = new Map<string, (typeof allSnapshots)[number][]>();
+  for (const snapshot of allSnapshots) {
+    const postSnapshots = snapshotsByPostId.get(snapshot.postId) ?? [];
+    postSnapshots.push(snapshot);
+    snapshotsByPostId.set(snapshot.postId, postSnapshots);
+  }
 
-    const snapshotRows = await db
-      .select({
-        id: postMetricSnapshots.id,
-        views: postMetricSnapshots.views,
-        interactions: postMetricSnapshots.interactions,
-        avgSecondsViewed: postMetricSnapshots.avgSecondsViewed,
-        capturedAt: postMetricSnapshots.capturedAt,
-        fileName: importBatches.fileName,
-      })
-      .from(postMetricSnapshots)
-      .innerJoin(importBatches, eq(postMetricSnapshots.batchId, importBatches.id))
-      .where(eq(postMetricSnapshots.postId, post.id))
-      .orderBy(desc(postMetricSnapshots.capturedAt), sql`${postMetricSnapshots.id} DESC`)
-      .all();
+  return allPosts.map((post) => {
+    const snapshotRows = snapshotsByPostId.get(post.id) ?? [];
+    const latestSnapshot = snapshotRows[0];
 
-    results.push({
+    return {
       id: post.id,
       externalPostId: post.externalPostId,
       scriptId: post.scriptId,
@@ -94,8 +100,6 @@ export async function getPostsWithLatestMetrics(): Promise<PostWithLatestMetrics
         capturedAt: snapshot.capturedAt,
         fileName: snapshot.fileName,
       })),
-    });
-  }
-
-  return results;
+    };
+  });
 }

@@ -123,6 +123,7 @@ export function MobileNav() {
                     <Link
                       key={item.href}
                       href={item.href}
+                      prefetch
                       aria-current={isActive ? "page" : undefined}
                       className={cn(
                         "min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber",
