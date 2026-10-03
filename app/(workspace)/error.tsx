@@ -20,21 +20,21 @@ export default function WorkspaceError({
       <div 
         role="alert"
         aria-live="assertive"
-        className="w-full max-w-md p-6 sm:p-8 rounded-xl border border-brand-rose/30 bg-surface-raised shadow-xl text-center space-y-4"
+        className="w-full max-w-md p-6 sm:p-8 rounded-2xl border border-brand-rose/30 bg-white/95 backdrop-blur-2xl shadow-apple-card text-center space-y-4"
       >
         <div className="w-12 h-12 rounded-full bg-brand-rose/10 border border-brand-rose/30 flex items-center justify-center text-brand-rose mx-auto">
           <AlertTriangle className="w-6 h-6" />
         </div>
 
         <div>
-          <h1 className="text-base sm:text-lg font-semibold text-slate-100">
+          <h1 className="text-base sm:text-lg font-semibold text-slate-900 tracking-tight">
             Studio Encountered an Issue
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             {error.message || "An unexpected error occurred while loading this studio view."}
           </p>
           {error.digest && (
-            <p className="text-[10px] font-mono text-slate-500 mt-1">
+            <p className="text-[10px] font-mono text-slate-400 mt-1">
               Digest: {error.digest}
             </p>
           )}
@@ -44,7 +44,7 @@ export default function WorkspaceError({
           <button
             type="button"
             onClick={() => reset()}
-            className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-brand-amber text-slate-950 font-semibold text-xs hover:bg-brand-amber/90 transition-colors shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+            className="apple-btn-primary w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Try Again</span>
@@ -52,7 +52,7 @@ export default function WorkspaceError({
 
           <Link
             href="/"
-            className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border-subtle bg-surface-subtle text-slate-300 hover:text-slate-100 hover:border-border-strong text-xs font-mono transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+            className="apple-press w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 text-xs font-mono transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber shadow-sm"
           >
             <Home className="w-3.5 h-3.5" />
             <span>Cockpit Dashboard</span>

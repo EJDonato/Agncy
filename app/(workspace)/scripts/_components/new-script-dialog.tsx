@@ -68,7 +68,7 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-amber text-slate-950 font-semibold text-xs hover:bg-brand-amber/90 transition-colors shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+        className="apple-btn-primary min-h-[44px] flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
       >
         <Plus className="w-4 h-4" />
         <span>New Script</span>
@@ -80,7 +80,7 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
 
       {isOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 md:left-64"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4 md:left-64 animate-in fade-in duration-200"
           onClick={() => setIsOpen(false)}
         >
           <div 
@@ -88,10 +88,10 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
             aria-modal="true"
             aria-labelledby="new-script-dialog-title"
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-border-strong bg-surface-raised p-5 sm:p-6 shadow-2xl space-y-4"
+            className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-2xl p-6 sm:p-7 shadow-[0_24px_64px_rgba(0,0,0,0.12),inset_0_1px_0_0_rgba(255,255,255,0.9)] space-y-5 animate-in zoom-in-95 duration-200"
           >
-            <div className="flex items-center justify-between border-b border-border-subtle pb-3">
-              <h2 id="new-script-dialog-title" className="font-semibold text-slate-100 flex items-center gap-2 text-sm">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3.5">
+              <h2 id="new-script-dialog-title" className="font-semibold text-slate-900 flex items-center gap-2.5 text-sm tracking-tight">
                 <Sparkles className="w-4 h-4 text-brand-amber shrink-0" />
                 <span>Draft New Script with Gemini</span>
               </h2>
@@ -99,7 +99,7 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
                 type="button"
                 onClick={() => setIsOpen(false)}
                 aria-label="Close dialog"
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+                className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -107,7 +107,7 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="script-topic-input" className="text-xs font-mono text-slate-400 block mb-1">
+                <label htmlFor="script-topic-input" className="text-[11px] font-mono tracking-wider text-slate-600 block mb-1.5 font-medium">
                   TOPIC / PREMISE OR HOOK ANGLE
                 </label>
                 <textarea
@@ -118,18 +118,18 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
                   required
                   rows={3}
                   placeholder="e.g. Bakit nagiging ghost town ang civic apps kahit may funding?"
-                  className="w-full px-3 py-2.5 rounded-lg bg-surface-subtle border border-border-subtle text-xs text-slate-100 focus:outline-none focus:border-brand-amber font-mono"
+                  className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 transition-all font-mono shadow-sm"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="script-format-select" className="text-xs font-mono text-slate-400 block mb-1">FORMAT</label>
+                  <label htmlFor="script-format-select" className="text-[11px] font-mono tracking-wider text-slate-600 block mb-1.5 font-medium">FORMAT</label>
                   <select
                     id="script-format-select"
                     name="format"
                     defaultValue="Reel"
-                    className="w-full min-h-[44px] px-3 py-2 rounded-lg bg-surface-subtle border border-border-subtle text-xs text-slate-100 focus:outline-none focus:border-brand-amber font-mono"
+                    className="w-full min-h-[44px] px-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-brand-amber font-mono shadow-sm"
                   >
                     <option value="Reel">Reel (9:16 Vertical)</option>
                     <option value="Short">YouTube Short</option>
@@ -138,14 +138,14 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
                 </div>
 
                 <div>
-                  <label htmlFor="script-duration-select" className="text-xs font-mono text-slate-400 block mb-1">
+                  <label htmlFor="script-duration-select" className="text-[11px] font-mono tracking-wider text-slate-600 block mb-1.5 font-medium">
                     TARGET DURATION
                   </label>
                   <select
                     id="script-duration-select"
                     name="targetDurationSec"
                     defaultValue="45"
-                    className="w-full min-h-[44px] px-3 py-2 rounded-lg bg-surface-subtle border border-border-subtle text-xs text-slate-100 focus:outline-none focus:border-brand-amber font-mono"
+                    className="w-full min-h-[44px] px-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-brand-amber font-mono shadow-sm"
                   >
                     <option value="30">~30 seconds</option>
                     <option value="45">~45 seconds (Recommended)</option>
@@ -157,24 +157,24 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
               {error && (
                 <div 
                   role="alert"
-                  className="p-3 rounded-lg bg-brand-rose/10 border border-brand-rose/30 text-brand-rose text-xs font-mono"
+                  className="p-3.5 rounded-xl bg-brand-rose/10 border border-brand-rose/30 text-brand-rose text-xs font-mono"
                 >
                   {error}
                 </div>
               )}
 
-              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-border-subtle">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 pt-3 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="min-h-[44px] px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors"
+                  className="apple-press min-h-[44px] px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isGenerating || topic.trim().length < 3}
-                  className="min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-brand-amber text-slate-950 font-semibold text-xs hover:bg-brand-amber/90 transition-colors disabled:opacity-50"
+                  className="apple-btn-primary min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs disabled:opacity-50 disabled:pointer-events-none"
                 >
                   {isGenerating ? (
                     <>

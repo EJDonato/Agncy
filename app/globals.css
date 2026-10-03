@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #090a0f;
-  --foreground: #f8fafc;
+  --background: #FFFFFF;
+  --foreground: #0F172A;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -14,20 +14,65 @@
 }
 
 body {
-  background-color: var(--background);
+  background-color: #FFFFFF;
   color: var(--foreground);
   overflow-x: hidden;
 }
 
 /* Polished input caret color matching studio amber */
 input, textarea {
-  caret-color: #F59E0B;
+  caret-color: #D97706;
 }
 
 /* Accessible focus ring default for keyboard navigation */
 :focus-visible {
-  outline: 2px solid #F59E0B;
+  outline: 2px solid #D97706;
   outline-offset: 2px;
+}
+
+/* Apple-style Fluid Interaction Utilities */
+.apple-press {
+  transition: transform 120ms cubic-bezier(0.25, 1, 0.5, 1), filter 120ms ease-out, background-color 150ms ease-out;
+}
+.apple-press:active {
+  transform: scale(0.975);
+  filter: brightness(0.96);
+}
+
+.apple-glass {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 6px 16px -4px rgba(0, 0, 0, 0.04);
+}
+
+.apple-glass-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 4px 14px -2px rgba(0, 0, 0, 0.04);
+  transition: transform 140ms cubic-bezier(0.25, 1, 0.5, 1), box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.apple-glass-card:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.07), 0 2px 6px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Apple Pro amber button style */
+.apple-btn-primary {
+  background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.28), inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+  transition: transform 120ms cubic-bezier(0.25, 1, 0.5, 1), filter 120ms ease-out, box-shadow 150ms ease-out;
+}
+.apple-btn-primary:hover {
+  filter: brightness(1.04);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+}
+.apple-btn-primary:active {
+  transform: scale(0.97);
+  filter: brightness(0.95);
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
 }
 
 /* Custom Scrollbars for High-Density Studio View */
@@ -37,14 +82,37 @@ input, textarea {
 }
 
 ::-webkit-scrollbar-track {
-  background: #090a0f;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #262b36;
-  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b4252;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Accessibility: Reduced motion & Reduced transparency */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .apple-press:active,
+  .apple-btn-primary:active {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .apple-glass,
+  .apple-glass-card {
+    background-color: #FFFFFF !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }

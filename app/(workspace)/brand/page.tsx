@@ -13,8 +13,8 @@ export default async function BrandBrainPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-100">Brand Brain</h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Brand Brain</h1>
+        <p className="text-sm text-slate-500 mt-1">
           Your persistent creator context and verified style rules dynamically injected into Google Gemini.
         </p>
       </div>

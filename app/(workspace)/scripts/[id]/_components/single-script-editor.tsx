@@ -91,22 +91,22 @@ export function SingleScriptEditor({
 
   return (
     <div className="space-y-4">
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-border-subtle">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200">
         <div className="flex items-center gap-3 min-w-0">
           <Link 
             href="/scripts" 
             aria-label="Back to scripts list" 
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg border border-border-subtle bg-surface-subtle text-slate-400 hover:text-slate-100 hover:border-border-strong transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber shrink-0"
+            className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber shrink-0 shadow-sm"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-base sm:text-lg font-semibold text-slate-100 truncate">{script.title}</h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-surface-subtle text-slate-400 border border-border-subtle">{script.format || "Reel"}</span>
-              {script.targetDurationSec && <span className="text-[11px] font-mono text-slate-400">~{script.targetDurationSec}s</span>}
+              <h1 className="text-base sm:text-lg font-semibold text-slate-900 truncate tracking-tight">{script.title}</h1>
+              <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono uppercase bg-slate-100 text-slate-600 border border-slate-200">{script.format || "Reel"}</span>
+              {script.targetDurationSec && <span className="text-[11px] font-mono text-slate-500">~{script.targetDurationSec}s</span>}
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">Edit directly or instruct Gemini. Saved scripts become context for future drafts.</p>
+            <p className="text-xs text-slate-500 mt-0.5">Edit directly or instruct Gemini. Saved scripts become context for future drafts.</p>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
@@ -115,7 +115,7 @@ export function SingleScriptEditor({
             onClick={() => setContent(aiBaseline)} 
             disabled={content === aiBaseline || isRevising} 
             aria-label="Reset content to initial draft"
-            className="min-h-[44px] px-3.5 rounded-lg border border-border-subtle text-xs font-mono text-slate-400 hover:text-slate-200 disabled:opacity-40 transition-colors flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+            className="apple-press min-h-[44px] px-3.5 rounded-xl border border-slate-200 bg-white text-xs font-mono text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-40 transition-all flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber shadow-sm"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset</span>
@@ -124,7 +124,7 @@ export function SingleScriptEditor({
             type="button" 
             onClick={() => void handleSave()} 
             disabled={isSaving || isRevising || !content.trim()} 
-            className="min-h-[44px] px-4 rounded-lg bg-brand-amber text-slate-950 font-semibold text-xs disabled:opacity-50 flex items-center gap-2 transition-colors hover:bg-brand-amber/90 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+            className="apple-btn-primary min-h-[44px] px-5 rounded-xl text-xs disabled:opacity-50 disabled:pointer-events-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
           >
             {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             <span>{isSaving ? "Saving..." : "Save Script"}</span>
@@ -134,9 +134,9 @@ export function SingleScriptEditor({
 
       <div aria-live="polite">
         <PersonaCard persona="scriptWriter" message={writerMessage} compact />
-        <form onSubmit={handleRevision} className="flex flex-col sm:flex-row gap-2 rounded-xl border border-brand-amber/30 bg-brand-amber/5 p-3">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <Sparkles className="w-4 h-4 text-brand-amber shrink-0" />
+        <form onSubmit={handleRevision} className="flex flex-col sm:flex-row gap-2 rounded-2xl border border-brand-amber/30 bg-amber-50/60 backdrop-blur-xl p-3 sm:p-3.5 shadow-sm">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <Sparkles className="w-4 h-4 text-brand-amber shrink-0 ml-1" />
             <input
               value={instruction}
               onChange={(event) => {
@@ -146,36 +146,36 @@ export function SingleScriptEditor({
               disabled={isRevising}
               aria-label="Prompt Gemini to revise this script"
               placeholder="Make the hook shorter, add more Taglish, strengthen the CTA..."
-              className="w-full bg-transparent text-xs sm:text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none min-h-[44px] px-1"
+              className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none min-h-[44px] px-1 font-mono"
             />
           </div>
           <button
             type="submit"
             disabled={isRevising || instruction.trim().length < 3 || !content.trim()}
-            className="min-h-[44px] px-4 rounded-lg bg-brand-amber/15 border border-brand-amber/30 text-brand-amber text-xs font-semibold disabled:opacity-40 flex items-center justify-center gap-2 hover:bg-brand-amber/25 transition-colors shrink-0"
+            className="apple-btn-primary min-h-[44px] px-5 rounded-xl text-xs font-semibold disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 transition-all shrink-0"
           >
-            {isRevising ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            {isRevising ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
             <span>{isRevising ? "Updating..." : "Apply Prompt"}</span>
           </button>
         </form>
       </div>
 
       {savedSuccess && (
-        <div role="status" aria-live="polite" className="p-3.5 rounded-lg bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald text-xs font-mono flex items-center gap-2">
+        <div role="status" aria-live="polite" className="p-3.5 rounded-xl bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald text-xs font-mono flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>Script saved. Gemini will use it as a writing reference for future drafts.</span>
         </div>
       )}
       {error && (
-        <div role="alert" className="p-3.5 rounded-lg bg-brand-rose/10 border border-brand-rose/30 text-brand-rose text-xs font-mono">
+        <div role="alert" className="p-3.5 rounded-xl bg-brand-rose/10 border border-brand-rose/30 text-brand-rose text-xs font-mono">
           {error}
         </div>
       )}
 
-      <section className="rounded-xl border border-border-subtle bg-surface-raised overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle bg-surface-subtle/50 text-xs font-mono">
-          <span className="font-semibold text-slate-300">SCRIPT</span>
-          <span className="text-slate-400">{wordCount} words</span>
+      <section className="rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-xl shadow-apple-card overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200 bg-slate-50/80 text-xs font-mono">
+          <span className="font-semibold text-slate-700 tracking-wider">SCRIPT</span>
+          <span className="text-slate-500">{wordCount} words</span>
         </div>
         <textarea 
           value={content} 
@@ -183,7 +183,7 @@ export function SingleScriptEditor({
           disabled={isRevising} 
           aria-label="Editable script draft" 
           spellCheck={false} 
-          className="w-full min-h-[380px] sm:min-h-[520px] p-4 sm:p-5 bg-surface-raised text-xs sm:text-sm text-slate-100 font-mono leading-relaxed resize-y focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-amber disabled:opacity-60" 
+          className="w-full min-h-[380px] sm:min-h-[520px] p-5 sm:p-6 bg-white text-xs sm:text-sm text-slate-900 font-mono leading-relaxed resize-y focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-amber/50 disabled:opacity-60" 
         />
       </section>
     </div>

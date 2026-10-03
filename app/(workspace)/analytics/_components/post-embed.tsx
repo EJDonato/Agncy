@@ -13,9 +13,9 @@ export function PostEmbed({ permalink, postType, title }: PostEmbedProps) {
 
   if (!permalink || !embedUrl) {
     return (
-      <div className="h-[260px] w-full max-w-[220px] rounded-lg border border-dashed border-border-subtle bg-surface-raised flex flex-col items-center justify-center gap-2 text-center p-4">
-        <ImageOff className="w-6 h-6 text-slate-500" />
-        <p className="text-xs text-slate-400">A Facebook preview is not available for this permalink.</p>
+      <div className="h-[260px] w-full max-w-[220px] rounded-xl border border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center gap-2 text-center p-4">
+        <ImageOff className="w-6 h-6 text-slate-400" />
+        <p className="text-xs text-slate-500">A Facebook preview is not available for this permalink.</p>
         {permalink && <PostLink permalink={permalink} title={title} />}
       </div>
     );
@@ -23,7 +23,7 @@ export function PostEmbed({ permalink, postType, title }: PostEmbedProps) {
 
   return (
     <div className="w-full max-w-[220px] space-y-2">
-      <div className="h-[260px] w-[220px] max-w-full overflow-hidden rounded-lg border border-border-subtle bg-white shadow-sm">
+      <div className="h-[260px] w-[220px] max-w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <iframe
           src={embedUrl}
           title={`Facebook post preview: ${title}`}

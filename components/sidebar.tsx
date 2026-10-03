@@ -10,18 +10,18 @@ export function Sidebar() {
 
   return (
     <aside 
-      className="hidden md:flex w-64 border-r border-border-subtle bg-surface-raised flex-col justify-between h-screen sticky top-0 z-[55] shrink-0"
+      className="hidden md:flex w-64 border-r border-slate-200 bg-white flex-col justify-between h-screen sticky top-0 z-[55] shrink-0 shadow-[1px_0_12px_rgba(0,0,0,0.02)]"
       aria-label="Sidebar navigation"
     >
       <div>
         {/* Brand Header */}
-        <div className="h-16 flex items-center px-6 border-b border-border-subtle gap-3">
-          <div className="w-8 h-8 rounded-lg bg-brand-amber/10 border border-brand-amber/30 flex items-center justify-center text-brand-amber font-mono font-bold text-lg">
+        <div className="h-16 flex items-center px-6 border-b border-slate-200 gap-3">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center font-mono font-bold text-base shadow-sm">
             A
           </div>
           <div>
-            <span className="font-bold tracking-tight text-slate-100 text-base">Agncy</span>
-            <span className="text-[10px] block font-mono text-slate-400">STUDIO COCKPIT</span>
+            <span className="font-bold tracking-tight text-slate-900 text-sm">Agncy</span>
+            <span className="text-[9px] block font-mono tracking-wider text-slate-500 font-semibold">STUDIO COCKPIT</span>
           </div>
         </div>
 
@@ -40,13 +40,13 @@ export function Sidebar() {
                 aria-label={`${item.label}: ${item.feature}`}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber",
+                  "apple-press flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber",
                   isActive
-                    ? "bg-surface-subtle text-brand-amber border border-border-strong/60 shadow-sm"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-surface-subtle/50"
+                    ? "bg-amber-50 text-amber-950 font-semibold border border-amber-200 shadow-sm"
+                    : "text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent"
                 )}
               >
-                <Icon className={cn("w-4 h-4", isActive ? "text-brand-amber" : "text-slate-400")} />
+                <Icon className={cn("w-4 h-4 transition-colors", isActive ? "text-amber-600" : "text-slate-400")} />
                 <span>{item.label}</span>
               </Link>
             );
@@ -54,7 +54,7 @@ export function Sidebar() {
         </nav>
       </div>
 
-      <div id="persona-dock" className="relative h-72 shrink-0 border-t border-border-subtle bg-canvas/40" />
+      <div id="persona-dock" className="relative h-64 shrink-0 border-t border-slate-200 bg-gradient-to-b from-white via-slate-50/50 to-slate-100/40" />
     </aside>
   );
 }
