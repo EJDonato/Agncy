@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { UploadCloud, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { UploadCloud, CheckCircle2, AlertCircle, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function CsvDropzone() {
@@ -53,9 +53,20 @@ export function CsvDropzone() {
     }
   }
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      fileInputRef.current?.click();
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Upload Meta Business Suite CSV export file"
+        onKeyDown={handleKeyDown}
         onDragOver={(e) => {
           e.preventDefault();
           setIsDragging(true);
@@ -63,7 +74,7 @@ export function CsvDropzone() {
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`p-8 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center ${
+        className={`p-6 sm:p-8 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber ${
           isDragging
             ? "border-brand-amber bg-brand-amber/5"
             : "border-border-subtle bg-surface-raised hover:border-border-strong hover:bg-surface-raised/80"
@@ -74,6 +85,7 @@ export function CsvDropzone() {
           type="file"
           accept=".csv"
           className="hidden"
+          aria-hidden="true"
           onChange={(e) => {
             const files = e.target.files;
             if (files && files.length > 0) {
@@ -82,12 +94,12 @@ export function CsvDropzone() {
           }}
         />
 
-        <div className="flex flex-col items-center justify-center space-y-2">
+        <div className="flex flex-col items-center justify-center space-y-3">
           {isUploading ? (
             <Loader2 className="w-8 h-8 text-brand-amber animate-spin" />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-surface-subtle border border-border-strong flex items-center justify-center text-brand-amber">
-              <UploadCloud className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-full bg-surface-subtle border border-border-strong flex items-center justify-center text-brand-amber">
+              <UploadCloud className="w-6 h-6" />
             </div>
           )}
 
@@ -96,11 +108,22 @@ export function CsvDropzone() {
               {isUploading ? "Parsing & Ingesting Meta CSV..." : "Drop Meta Business Suite CSV export here"}
             </span>
             <span className="text-xs text-slate-400 mt-0.5 block">
-              Click to browse or drop `Content_Publish_time_Summary_*.csv`
+              Tap to browse or drop `Content_Publish_time_Summary_*.csv`
             </span>
           </div>
 
-          <div className="flex items-center gap-2 pt-2 text-[11px] font-mono text-slate-500">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              fileInputRef.current?.click();
+            }}
+            className="min-h-[44px] px-4 py-2 rounded-lg bg-surface-subtle border border-border-strong text-slate-200 hover:text-brand-amber hover:border-brand-amber/40 text-xs font-mono transition-colors"
+          >
+            Browse CSV File
+          </button>
+
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] font-mono text-slate-400">
             <span>• Strips BOM</span>
             <span>• Normalizes Unicode Bold</span>
             <span>• Snapshots Lifetime Views</span>
@@ -111,23 +134,29 @@ export function CsvDropzone() {
       {/* Result Notification Banner */}
       {result && (
         <div
-          className={`p-4 rounded-lg text-xs font-mono flex items-start gap-3 border ${
+          role={result.success ? "status" : "alert"}
+          aria-live="polite"
+          className={`p-4 rounded-lg text-xs font-mono flex items-center justify-between gap-3 border ${
             result.success
               ? "bg-brand-emerald/10 border-brand-emerald/30 text-brand-emerald"
               : "bg-brand-rose/10 border-brand-rose/30 text-brand-rose"
           }`}
         >
-          {result.success ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
-          ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-          )}
-          <div className="flex-1">{result.message}</div>
+          <div className="flex items-start gap-2.5 min-w-0">
+            {result.success ? (
+              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+            ) : (
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            )}
+            <div className="flex-1 break-words">{result.message}</div>
+          </div>
           <button
+            type="button"
             onClick={() => setResult(null)}
-            className="text-slate-400 hover:text-slate-200 text-xs ml-2"
+            aria-label="Dismiss upload notification"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-200 rounded-lg shrink-0"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}

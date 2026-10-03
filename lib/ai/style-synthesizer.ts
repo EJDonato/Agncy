@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { styleRules } from "@/lib/db/schema";
 import crypto from "node:crypto";
 import { z } from "zod";
+import { GEMINI_FLASH_MODELS } from "./models";
 
 export interface AnalyzeEditParams {
   brandId?: string;
@@ -10,13 +11,8 @@ export interface AnalyzeEditParams {
   initialDraft: string;
   finalEdit: string;
   survivalPercentage: number;
+  revisionInstructions?: string[];
 }
-
-const CANDIDATE_MODELS = [
-  "gemini-3-flash-preview",
-  "gemini-3.5-flash-lite",
-  "gemini-3.1-flash-lite",
-];
 
 const StyleAnalysisSchema = z.object({
   editSummary: z.string().min(1),
@@ -49,10 +45,11 @@ export async function analyzeEditAndSynthesizeStyle(params: AnalyzeEditParams): 
     rationale: string;
   };
 }> {
-  const { scriptTitle, initialDraft, finalEdit, survivalPercentage } = params;
+  const { scriptTitle, initialDraft, finalEdit, survivalPercentage, revisionInstructions = [] } = params;
 
   const prompt = `You are the style analyst for Agncy. Compare the AI initial draft vs the creator's final version for the script titled "${scriptTitle}".
 Draft Survival Rate: ${survivalPercentage}%
+${revisionInstructions.length > 0 ? `CREATOR REVISION INSTRUCTIONS:\n${revisionInstructions.map((instruction) => `- ${instruction}`).join("\n")}\n` : ""}
 
 AI INITIAL DRAFT:
 """
@@ -82,7 +79,7 @@ Respond in JSON with this structure:
     const ai = getGeminiClient();
     let rawJsonText = "";
 
-    for (const model of CANDIDATE_MODELS) {
+    for (const model of GEMINI_FLASH_MODELS) {
       try {
         const response = await withTimeout(ai.models.generateContent({
           model,

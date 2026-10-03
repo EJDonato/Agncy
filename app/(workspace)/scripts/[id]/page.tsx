@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getScriptWithVersions } from "@/lib/db/queries/scripts";
-import { SplitEditor } from "./_components/split-editor";
+import { SingleScriptEditor } from "./_components/single-script-editor";
 
 interface ScriptPageProps {
   params: Promise<{ id: string }>;
@@ -15,7 +15,7 @@ export default async function ScriptDetailPage({ params }: ScriptPageProps) {
   }
 
   return (
-    <SplitEditor
+    <SingleScriptEditor
       script={{
         id: data.script.id,
         title: data.script.title,
@@ -23,8 +23,8 @@ export default async function ScriptDetailPage({ params }: ScriptPageProps) {
         targetDurationSec: data.script.targetDurationSec,
         status: data.script.status,
       }}
-      initialDraftText={data.initialDraft?.fullContent || ""}
-      initialFinalText={data.latestFinal?.fullContent || data.initialDraft?.fullContent || ""}
+      baselineText={data.latestAiVersion?.fullContent || ""}
+      initialContent={data.latestEditable?.fullContent || ""}
       initialEditSummary={data.diff?.editSummary || null}
     />
   );

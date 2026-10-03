@@ -61,13 +61,17 @@ export function getScriptWithVersions(scriptId: string) {
     .get();
 
   const initialDraft = versions.find((v) => v.versionType === "ai_initial_draft") || versions[versions.length - 1];
-  const latestFinal = versions.find((v) => v.versionType === "final_version") || initialDraft;
+  const latestAiVersion = versions.find((v) =>
+    v.versionType === "ai_revision" || v.versionType === "ai_initial_draft"
+  ) || initialDraft;
+  const latestEditable = versions[0] || initialDraft;
 
   return {
     script,
     versions,
     diff,
     initialDraft,
-    latestFinal,
+    latestAiVersion,
+    latestEditable,
   };
 }

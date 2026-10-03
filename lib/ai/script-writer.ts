@@ -5,18 +5,13 @@ import { eq } from "drizzle-orm";
 import { ScriptDraftSchema, formatScriptDraftToMarkdown, type ScriptDraft } from "./schemas";
 import { buildFewShotContext } from "./few-shot-context";
 import crypto from "node:crypto";
+import { GEMINI_FLASH_MODELS } from "./models";
 
 export interface GenerateScriptParams {
   topic: string;
   format?: string;
   targetDurationSec?: number;
 }
-
-const CANDIDATE_MODELS = [
-  "gemini-3-flash-preview",
-  "gemini-3.5-flash-lite",
-  "gemini-3.1-flash-lite",
-];
 
 export async function generateScriptDraft(params: GenerateScriptParams): Promise<{
   scriptId: string;
@@ -67,7 +62,7 @@ ${fewShotContext ? `Use these successful draft-to-final pairs as style examples:
   let rawJsonText = "";
   let lastError: unknown = null;
 
-  for (const model of CANDIDATE_MODELS) {
+  for (const model of GEMINI_FLASH_MODELS) {
     try {
       const response = await ai.models.generateContent({
         model,
