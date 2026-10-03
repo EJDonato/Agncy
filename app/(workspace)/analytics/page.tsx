@@ -3,6 +3,7 @@ import { CsvDropzone } from "./_components/csv-dropzone";
 import { PostsTable } from "./_components/posts-table";
 import { getScriptsList } from "@/lib/db/queries/scripts";
 import { BarChart3, TrendingUp, Film, Eye, Sparkles } from "lucide-react";
+import { PersonaCard } from "@/components/persona-card";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,8 @@ export default async function AnalyticsPage() {
           <span className="text-brand-emerald">{posts.length} posts recorded</span>
         </div>
       </div>
+
+      <PersonaCard persona="performanceAnalyst" />
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

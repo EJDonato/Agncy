@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { UploadCloud, Cpu, Sparkles, Film, CheckCircle2, Type, Sliders } from "lucide-react";
+import { PersonaCard } from "@/components/persona-card";
 
 export default function StudioPage() {
   const [selectedFile, setSelectedFile] = useState<{ name: string; sizeMb: string } | null>(null);
@@ -28,6 +29,8 @@ export default function StudioPage() {
           </p>
         </div>
       </div>
+
+      <PersonaCard persona="videoEditor" />
 
       {/* Engine Status Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

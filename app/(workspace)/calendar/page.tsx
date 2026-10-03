@@ -2,6 +2,7 @@ import { Calendar as CalendarIcon, Film, Clock, FileText, CheckCircle2 } from "l
 import Link from "next/link";
 import { getPostsWithLatestMetrics } from "@/lib/db/queries/posts";
 import { getScriptsList } from "@/lib/db/queries/scripts";
+import { PersonaCard } from "@/components/persona-card";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,8 @@ export default async function CalendarPage() {
           </p>
         </div>
       </div>
+
+      <PersonaCard persona="contentPlanner" />
 
       {/* Production Pipeline Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

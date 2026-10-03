@@ -2,6 +2,7 @@ import { Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { getIdeasList } from "@/lib/db/queries/ideas";
 import { IdeaForm } from "./_components/idea-form";
+import { PersonaCard } from "@/components/persona-card";
 
 const CURATED_SEEDS = [
   {
@@ -34,6 +35,8 @@ export default async function IdeasPage() {
           </p>
         </div>
       </div>
+
+      <PersonaCard persona="contentStrategist" />
 
       {/* Quick Add Topic Seed */}
       <IdeaForm />

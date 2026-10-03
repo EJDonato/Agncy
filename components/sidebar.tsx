@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Cpu, Database } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WORKSPACE_NAV_ITEMS } from "@/components/workspace-nav-items";
 
@@ -11,7 +10,7 @@ export function Sidebar() {
 
   return (
     <aside 
-      className="hidden md:flex w-64 border-r border-border-subtle bg-surface-raised flex-col justify-between h-screen sticky top-0 shrink-0"
+      className="hidden md:flex w-64 border-r border-border-subtle bg-surface-raised flex-col justify-between h-screen sticky top-0 z-[55] shrink-0"
       aria-label="Sidebar navigation"
     >
       <div>
@@ -55,26 +54,7 @@ export function Sidebar() {
         </nav>
       </div>
 
-      {/* Local Engine Status Panel */}
-      <div className="p-4 border-t border-border-subtle bg-canvas/40 m-3 rounded-lg border">
-        <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-          <Cpu className="w-3.5 h-3.5 text-brand-amber" />
-          <span>Local Engine</span>
-        </div>
-        <div className="space-y-1.5 text-xs text-slate-300">
-          <div className="flex items-center justify-between">
-            <span className="text-slate-400 flex items-center gap-1.5">
-              <Database className="w-3 h-3 text-brand-emerald" />
-              SQLite WAL
-            </span>
-            <span className="text-[11px] font-mono text-brand-emerald">Active</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-slate-400">Whisper Local</span>
-            <span className="text-[11px] font-mono text-slate-400">Metal Ready</span>
-          </div>
-        </div>
-      </div>
+      <div id="persona-dock" className="relative h-72 shrink-0 border-t border-border-subtle bg-canvas/40" />
     </aside>
   );
 }

@@ -33,9 +33,6 @@ export default async function ScriptsPage({ searchParams }: ScriptsPageProps) {
           <p className="text-xs text-slate-400 max-w-md mx-auto">
             Generate your first Reel script from a topic. Each finalized script becomes a writing reference for future drafts.
           </p>
-          <div className="pt-2">
-            <NewScriptDialog initialTopic={topic} />
-          </div>
         </div>
       ) : (
         <div className="grid gap-3">

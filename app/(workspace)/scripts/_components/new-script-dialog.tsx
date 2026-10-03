@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Sparkles, Plus, X, Loader2 } from "lucide-react";
 import { createScriptDraftAction } from "@/lib/actions/scripts";
 import { useRouter } from "next/navigation";
+import { PersonaCard } from "@/components/persona-card";
 
 interface NewScriptDialogProps {
   initialTopic?: string;
@@ -16,6 +17,13 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const writerMessage = error
+    ? "That didn’t go through. Adjust the prompt or try once more."
+    : isGenerating
+      ? "I’m drafting it now—tight hook first, then the supporting beats."
+      : topic.trim().length >= 3
+        ? "That’s a workable angle. I’ll build the script around its strongest tension."
+        : "Tell me the premise or rough hook. It doesn’t need to be polished.";
 
   useEffect(() => {
     if (initialTopic) {
@@ -66,9 +74,13 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
         <span>New Script</span>
       </button>
 
+      <div aria-live="polite">
+        <PersonaCard persona="scriptWriter" message={writerMessage} compact />
+      </div>
+
       {isOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 md:left-64"
           onClick={() => setIsOpen(false)}
         >
           <div 

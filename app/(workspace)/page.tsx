@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { styleRules, scripts } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { GEMINI_SCRIPT_MODEL_LABEL } from "@/lib/ai/models";
+import { PersonaCard } from "@/components/persona-card";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,8 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      <PersonaCard persona="creativeDirector" />
 
       {/* KPI Metric Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

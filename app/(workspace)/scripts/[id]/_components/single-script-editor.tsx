@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Loader2, RotateCcw, Save, Send, Sparkles } from "lucide-react";
 import { reviseScriptWithPromptAction, saveFinalScriptVersionAction } from "@/lib/actions/scripts";
+import { PersonaCard } from "@/components/persona-card";
 
 interface SingleScriptEditorProps {
   script: {
@@ -28,8 +29,22 @@ export function SingleScriptEditor({
   const [isRevising, setIsRevising] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [revisionComplete, setRevisionComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
+  const writerMessage = error
+    ? "I hit a problem with that request. Try rewording it and send it again."
+    : isRevising
+      ? "I’m working through that revision now."
+      : isSaving
+        ? "I’m saving your version and its writing patterns."
+        : savedSuccess
+          ? "Saved. I’ll use the choices you made when we write the next script."
+          : revisionComplete
+            ? "Done. Read it through and tell me what still feels off."
+            : instruction.trim().length >= 3
+              ? "Got it. Send that instruction and I’ll reshape the current draft."
+              : "Tell me what to change—hook, tone, pacing, wording, or structure.";
 
   async function handleRevision(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,6 +53,7 @@ export function SingleScriptEditor({
     setIsRevising(true);
     setError(null);
     setSavedSuccess(false);
+    setRevisionComplete(false);
     try {
       const result = await reviseScriptWithPromptAction({
         scriptId: script.id,
@@ -47,6 +63,7 @@ export function SingleScriptEditor({
       setContent(result.revisedContent);
       setAiBaseline(result.revisedContent);
       setInstruction("");
+      setRevisionComplete(true);
     } catch (revisionError) {
       setError(revisionError instanceof Error ? revisionError.message : "Gemini could not revise the script.");
     } finally {
@@ -115,27 +132,33 @@ export function SingleScriptEditor({
         </div>
       </header>
 
-      <form onSubmit={handleRevision} className="flex flex-col sm:flex-row gap-2 rounded-xl border border-brand-amber/30 bg-brand-amber/5 p-3">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <Sparkles className="w-4 h-4 text-brand-amber shrink-0" />
-          <input 
-            value={instruction} 
-            onChange={(event) => setInstruction(event.target.value)} 
-            disabled={isRevising} 
-            aria-label="Prompt Gemini to revise this script" 
-            placeholder="Make the hook shorter, add more Taglish, strengthen the CTA..." 
-            className="w-full bg-transparent text-xs sm:text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none min-h-[44px] px-1" 
-          />
-        </div>
-        <button 
-          type="submit" 
-          disabled={isRevising || instruction.trim().length < 3 || !content.trim()} 
-          className="min-h-[44px] px-4 rounded-lg bg-brand-amber/15 border border-brand-amber/30 text-brand-amber text-xs font-semibold disabled:opacity-40 flex items-center justify-center gap-2 hover:bg-brand-amber/25 transition-colors shrink-0"
-        >
-          {isRevising ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-          <span>{isRevising ? "Updating..." : "Apply Prompt"}</span>
-        </button>
-      </form>
+      <div aria-live="polite">
+        <PersonaCard persona="scriptWriter" message={writerMessage} compact />
+        <form onSubmit={handleRevision} className="flex flex-col sm:flex-row gap-2 rounded-xl border border-brand-amber/30 bg-brand-amber/5 p-3">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Sparkles className="w-4 h-4 text-brand-amber shrink-0" />
+            <input
+              value={instruction}
+              onChange={(event) => {
+                setInstruction(event.target.value);
+                setRevisionComplete(false);
+              }}
+              disabled={isRevising}
+              aria-label="Prompt Gemini to revise this script"
+              placeholder="Make the hook shorter, add more Taglish, strengthen the CTA..."
+              className="w-full bg-transparent text-xs sm:text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none min-h-[44px] px-1"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isRevising || instruction.trim().length < 3 || !content.trim()}
+            className="min-h-[44px] px-4 rounded-lg bg-brand-amber/15 border border-brand-amber/30 text-brand-amber text-xs font-semibold disabled:opacity-40 flex items-center justify-center gap-2 hover:bg-brand-amber/25 transition-colors shrink-0"
+          >
+            {isRevising ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            <span>{isRevising ? "Updating..." : "Apply Prompt"}</span>
+          </button>
+        </form>
+      </div>
 
       {savedSuccess && (
         <div role="status" aria-live="polite" className="p-3.5 rounded-lg bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald text-xs font-mono flex items-center gap-2">

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Cpu, Database } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WORKSPACE_NAV_ITEMS } from "@/components/workspace-nav-items";
 
@@ -121,20 +121,6 @@ export function MobileNav() {
               </nav>
             </div>
 
-            {/* Mobile Local Engine Status */}
-            <div className="p-3 border border-border-subtle bg-canvas/40 rounded-lg text-xs text-slate-300">
-              <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                <Cpu className="w-3.5 h-3.5 text-brand-amber" />
-                <span>Local Engine</span>
-              </div>
-              <div className="flex items-center justify-between text-[11px] font-mono">
-                <span className="flex items-center gap-1 text-slate-400">
-                  <Database className="w-3 h-3 text-brand-emerald" />
-                  SQLite WAL
-                </span>
-                <span className="text-brand-emerald">Active</span>
-              </div>
-            </div>
           </div>
         </div>
       )}
