@@ -3,30 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Menu, 
-  X, 
-  LayoutDashboard, 
-  BrainCircuit, 
-  FileText, 
-  Lightbulb, 
-  Video, 
-  BarChart3, 
-  Calendar,
-  Cpu,
-  Database
-} from "lucide-react";
+import { Menu, X, Cpu, Database } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const NAV_ITEMS = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/brand", label: "Brand Brain", icon: BrainCircuit },
-  { href: "/scripts", label: "Script Studio", icon: FileText },
-  { href: "/ideas", label: "Idea Hub", icon: Lightbulb },
-  { href: "/studio", label: "Captions & Media", icon: Video },
-  { href: "/analytics", label: "Analytics & CSV", icon: BarChart3 },
-  { href: "/calendar", label: "Calendar", icon: Calendar },
-];
+import { WORKSPACE_NAV_ITEMS } from "@/components/workspace-nav-items";
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -115,7 +94,7 @@ export function MobileNav() {
               </div>
 
               <nav className="py-3 space-y-1" aria-label="Mobile Navigation Links">
-                {NAV_ITEMS.map((item) => {
+                {WORKSPACE_NAV_ITEMS.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
 
@@ -124,6 +103,8 @@ export function MobileNav() {
                       key={item.href}
                       href={item.href}
                       prefetch
+                      title={item.feature}
+                      aria-label={`${item.label}: ${item.feature}`}
                       aria-current={isActive ? "page" : undefined}
                       className={cn(
                         "min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber",
