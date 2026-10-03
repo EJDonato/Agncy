@@ -2,6 +2,7 @@ import { getGeminiClient } from "./gemini";
 import { db } from "@/lib/db";
 import { styleRules } from "@/lib/db/schema";
 import crypto from "node:crypto";
+import { z } from "zod";
 
 export interface AnalyzeEditParams {
   brandId?: string;
@@ -16,6 +17,29 @@ const CANDIDATE_MODELS = [
   "gemini-3.5-flash-lite",
   "gemini-3.1-flash-lite",
 ];
+
+const StyleAnalysisSchema = z.object({
+  editSummary: z.string().min(1),
+  proposedRule: z.object({
+    category: z.enum(["hook", "pacing", "vocabulary", "structure", "tone"]),
+    ruleText: z.string().min(5),
+    rationale: z.string().min(1),
+  }).nullable().optional(),
+});
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("Style analysis timed out")), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
 
 export async function analyzeEditAndSynthesizeStyle(params: AnalyzeEditParams): Promise<{
   editSummary: string;
@@ -60,13 +84,29 @@ Respond in JSON with this structure:
 
     for (const model of CANDIDATE_MODELS) {
       try {
-        const response = await ai.models.generateContent({
+        const response = await withTimeout(ai.models.generateContent({
           model,
           contents: prompt,
           config: {
             responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                editSummary: { type: "STRING" },
+                proposedRule: {
+                  type: "OBJECT",
+                  properties: {
+                    category: { type: "STRING", enum: ["hook", "pacing", "vocabulary", "structure", "tone"] },
+                    ruleText: { type: "STRING" },
+                    rationale: { type: "STRING" },
+                  },
+                  required: ["category", "ruleText", "rationale"],
+                },
+              },
+              required: ["editSummary"],
+            },
           },
-        });
+        }), 30_000);
 
         if (response.text) {
           rawJsonText = response.text;
@@ -83,8 +123,8 @@ Respond in JSON with this structure:
       };
     }
 
-    const parsed = JSON.parse(rawJsonText || "{}");
-    const editSummary = parsed.editSummary || `Creator modified script (${survivalPercentage}% AI draft retained).`;
+    const parsed = StyleAnalysisSchema.parse(JSON.parse(rawJsonText));
+    const editSummary = parsed.editSummary;
 
     if (parsed.proposedRule && parsed.proposedRule.ruleText) {
       const brandId = params.brandId || "default_profile";

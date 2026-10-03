@@ -60,7 +60,14 @@ export async function saveFinalScriptVersionAction(data: { scriptId: string; fin
   const draftText = initialDraft ? initialDraft.fullContent : finalContent;
   const diffResult = computeScriptDiff(draftText, finalContent);
 
-  const newVersionNumber = (initialDraft?.versionNumber ?? 1) + 1;
+  const latestVersion = db
+    .select({ versionNumber: scriptVersions.versionNumber })
+    .from(scriptVersions)
+    .where(eq(scriptVersions.scriptId, scriptId))
+    .orderBy(desc(scriptVersions.versionNumber))
+    .limit(1)
+    .get();
+  const newVersionNumber = (latestVersion?.versionNumber ?? 0) + 1;
   const newVersionId = `ver_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`;
   const diffId = `diff_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`;
 
@@ -86,6 +93,10 @@ export async function saveFinalScriptVersionAction(data: { scriptId: string; fin
           draftTokenCount: diffResult.draftWordCount,
           finalTokenCount: diffResult.finalWordCount,
           retainedTokens: diffResult.retainedWordCount,
+          tokenLcsMap: JSON.stringify({
+            draft: diffResult.annotatedDraft,
+            final: diffResult.annotatedFinal,
+          }),
           analyzedAt: new Date().toISOString(),
         })
         .where(eq(scriptDiffs.id, existingDiff.id))
@@ -100,6 +111,10 @@ export async function saveFinalScriptVersionAction(data: { scriptId: string; fin
         draftTokenCount: diffResult.draftWordCount,
         finalTokenCount: diffResult.finalWordCount,
         retainedTokens: diffResult.retainedWordCount,
+        tokenLcsMap: JSON.stringify({
+          draft: diffResult.annotatedDraft,
+          final: diffResult.annotatedFinal,
+        }),
       }).run();
     }
 
@@ -113,14 +128,17 @@ export async function saveFinalScriptVersionAction(data: { scriptId: string; fin
       .run();
   });
 
-  // Run AI style synthesis in background
-  analyzeEditAndSynthesizeStyle({
+  const analysis = await analyzeEditAndSynthesizeStyle({
     brandId: existingScript.brandId,
     scriptTitle: existingScript.title,
     initialDraft: draftText,
     finalEdit: finalContent,
     survivalPercentage: diffResult.survivalPercentage,
-  }).catch((e) => console.error("Background style synthesis error:", e));
+  });
+  db.update(scriptDiffs)
+    .set({ editSummary: analysis.editSummary })
+    .where(eq(scriptDiffs.scriptId, scriptId))
+    .run();
 
   revalidatePath(`/scripts/${scriptId}`);
   revalidatePath("/scripts");
@@ -130,5 +148,6 @@ export async function saveFinalScriptVersionAction(data: { scriptId: string; fin
   return {
     success: true,
     survivalPercentage: diffResult.survivalPercentage,
+    editSummary: analysis.editSummary,
   };
 }

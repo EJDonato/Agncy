@@ -25,6 +25,7 @@ export default async function ScriptDetailPage({ params }: ScriptPageProps) {
       }}
       initialDraftText={data.initialDraft?.fullContent || ""}
       initialFinalText={data.latestFinal?.fullContent || data.initialDraft?.fullContent || ""}
+      initialEditSummary={data.diff?.editSummary || null}
     />
   );
 }

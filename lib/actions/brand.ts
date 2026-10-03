@@ -77,6 +77,29 @@ export async function rejectStyleRuleAction(ruleId: string) {
   return { success: true };
 }
 
+const EditRuleSchema = z.object({
+  ruleId: z.string().min(1),
+  ruleText: z.string().trim().min(5),
+  category: z.enum(["hook", "pacing", "vocabulary", "structure", "tone"]),
+});
+
+export async function editAndApproveStyleRuleAction(input: z.infer<typeof EditRuleSchema>) {
+  const parsed = EditRuleSchema.parse(input);
+  db.update(styleRules)
+    .set({
+      category: parsed.category,
+      ruleText: parsed.ruleText,
+      status: "active",
+      approvedAt: new Date().toISOString(),
+    })
+    .where(eq(styleRules.id, parsed.ruleId))
+    .run();
+
+  revalidatePath("/brand");
+  revalidatePath("/");
+  return { success: true };
+}
+
 export async function createManualRuleAction(formData: FormData) {
   const ruleText = formData.get("ruleText") as string;
   const category = (formData.get("category") as "hook" | "pacing" | "vocabulary" | "structure" | "tone") || "tone";
@@ -86,11 +109,13 @@ export async function createManualRuleAction(formData: FormData) {
   }
 
   const existingProfile = db.select().from(brandProfiles).limit(1).get();
-  const brandId = existingProfile?.id || "default_profile";
+  if (!existingProfile) {
+    throw new Error("Save your Brand Brain profile before adding style rules.");
+  }
 
   db.insert(styleRules).values({
     id: `rule_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`,
-    brandId,
+    brandId: existingProfile.id,
     category,
     ruleText: ruleText.trim(),
     rationale: "Manually created by creator",

@@ -1,8 +1,9 @@
 import { getGeminiClient } from "./gemini";
 import { db } from "@/lib/db";
 import { brandProfiles, styleRules, scripts, scriptVersions } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { ScriptDraftSchema, formatScriptDraftToMarkdown, type ScriptDraft } from "./schemas";
+import { buildFewShotContext } from "./few-shot-context";
 import crypto from "node:crypto";
 
 export interface GenerateScriptParams {
@@ -24,15 +25,10 @@ export async function generateScriptDraft(params: GenerateScriptParams): Promise
 }> {
   const { topic, format = "Reel", targetDurationSec = 45 } = params;
 
-  // 1. Fetch Brand Profile (or use defaults)
-  const profile = db.select().from(brandProfiles).limit(1).get() || {
-    creatorName: "Elton",
-    niche: "Civic innovation, grassroots community apps, and public interest technology",
-    targetAudience: "Filipino developers, community organizers, youth civic builders",
-    toneOfVoice: "Direct, empathetic, grounded, analytical. No cringe hype or generic buzzwords.",
-    languageMix: "Conversational Taglish (Filipino/English balance with emotional particles: kasi, naman, talaga)",
-    dosAndDonts: "Do not start with 'Hey guys' or generic greetings. Start directly at the paradox.",
-  };
+  const profile = db.select().from(brandProfiles).limit(1).get();
+  if (!profile) {
+    throw new Error("Set up your Brand Brain profile before generating a script.");
+  }
 
   // 2. Fetch Active Style Rules
   const activeRules = db
@@ -41,14 +37,7 @@ export async function generateScriptDraft(params: GenerateScriptParams): Promise
     .where(eq(styleRules.status, "active"))
     .all();
 
-  // 3. Fetch Top Few-Shots
-  const pastScripts = db
-    .select()
-    .from(scripts)
-    .where(eq(scripts.status, "finalized"))
-    .orderBy(desc(scripts.createdAt))
-    .limit(2)
-    .all();
+  const fewShotContext = await buildFewShotContext(topic);
 
   const rulesText =
     activeRules.length > 0
@@ -60,6 +49,7 @@ Niche: ${profile.niche}
 Target Audience: ${profile.targetAudience}
 Tone: ${profile.toneOfVoice}
 Language Mix: ${profile.languageMix}
+Creator Guardrails: ${profile.dosAndDonts || "None supplied"}
 
 CRITICAL RULES:
 ${rulesText}
@@ -70,7 +60,7 @@ Return ONLY valid JSON strictly matching the schema.`;
   const prompt = `Topic: "${topic}"
 Target Duration: ${targetDurationSec} seconds
 Format: ${format}
-${pastScripts.length > 0 ? `Past Reference Scripts:\n${pastScripts.map((s) => s.title).join(", ")}` : ""}`;
+${fewShotContext ? `Use these successful draft-to-final pairs as style examples:\n\n${fewShotContext}` : ""}`;
 
   const ai = getGeminiClient();
 
@@ -153,7 +143,7 @@ ${pastScripts.length > 0 ? `Past Reference Scripts:\n${pastScripts.map((s) => s.
   db.transaction((tx) => {
     tx.insert(scripts).values({
       id: scriptId,
-      brandId: profile && "id" in profile && profile.id ? (profile.id as string) : "default_profile",
+      brandId: profile.id,
       title: validatedDraft.title,
       format,
       targetDurationSec,

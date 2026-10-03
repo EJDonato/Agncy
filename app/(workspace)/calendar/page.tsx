@@ -1,4 +1,4 @@
-import { Calendar as CalendarIcon, Clock } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 
 export default function CalendarPage() {
   return (

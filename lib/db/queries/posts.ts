@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { posts, postMetricSnapshots } from "@/lib/db/schema";
+import { importBatches, posts, postMetricSnapshots } from "@/lib/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
 
 export interface PostWithLatestMetrics {
@@ -22,6 +22,16 @@ export interface PostWithLatestMetrics {
   saves: number;
   avgSecondsViewed: number;
   distributionScore: string | null;
+  snapshots: PostSnapshot[];
+}
+
+export interface PostSnapshot {
+  id: string;
+  views: number;
+  interactions: number;
+  avgSecondsViewed: number;
+  capturedAt: string | null;
+  fileName: string;
 }
 
 export async function getPostsWithLatestMetrics(): Promise<PostWithLatestMetrics[]> {
@@ -42,6 +52,21 @@ export async function getPostsWithLatestMetrics(): Promise<PostWithLatestMetrics
       .limit(1)
       .get();
 
+    const snapshotRows = await db
+      .select({
+        id: postMetricSnapshots.id,
+        views: postMetricSnapshots.views,
+        interactions: postMetricSnapshots.interactions,
+        avgSecondsViewed: postMetricSnapshots.avgSecondsViewed,
+        capturedAt: postMetricSnapshots.capturedAt,
+        fileName: importBatches.fileName,
+      })
+      .from(postMetricSnapshots)
+      .innerJoin(importBatches, eq(postMetricSnapshots.batchId, importBatches.id))
+      .where(eq(postMetricSnapshots.postId, post.id))
+      .orderBy(desc(postMetricSnapshots.capturedAt), sql`${postMetricSnapshots.id} DESC`)
+      .all();
+
     results.push({
       id: post.id,
       externalPostId: post.externalPostId,
@@ -61,6 +86,14 @@ export async function getPostsWithLatestMetrics(): Promise<PostWithLatestMetrics
       saves: latestSnapshot?.saves ?? 0,
       avgSecondsViewed: latestSnapshot?.avgSecondsViewed ?? 0,
       distributionScore: latestSnapshot?.distributionScore ?? "--",
+      snapshots: snapshotRows.map((snapshot) => ({
+        id: snapshot.id,
+        views: snapshot.views ?? 0,
+        interactions: snapshot.interactions ?? 0,
+        avgSecondsViewed: snapshot.avgSecondsViewed ?? 0,
+        capturedAt: snapshot.capturedAt,
+        fileName: snapshot.fileName,
+      })),
     });
   }
 

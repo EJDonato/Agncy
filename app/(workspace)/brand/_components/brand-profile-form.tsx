@@ -103,7 +103,7 @@ export function BrandProfileForm({ initialData }: Props) {
       </div>
 
       <div>
-        <label className="text-xs font-mono text-slate-400 block mb-1">DO'S & DON'TS / GUARDRAILS</label>
+        <label className="text-xs font-mono text-slate-400 block mb-1">DO&apos;S &amp; DON&apos;TS / GUARDRAILS</label>
         <textarea
           name="dosAndDonts"
           defaultValue={initialData?.dosAndDonts || "Never start with 'Hey guys'. Start directly at the paradox or friction. Use natural Taglish particles (kasi, naman, talaga)."}

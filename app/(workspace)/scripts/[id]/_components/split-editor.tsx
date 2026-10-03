@@ -18,17 +18,20 @@ interface SplitEditorProps {
   };
   initialDraftText: string;
   initialFinalText: string;
+  initialEditSummary: string | null;
 }
 
 export function SplitEditor({
   script,
   initialDraftText,
   initialFinalText,
+  initialEditSummary,
 }: SplitEditorProps) {
   const [finalContent, setFinalContent] = useState(initialFinalText || initialDraftText);
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editSummary, setEditSummary] = useState(initialEditSummary);
 
   const diffResult = useMemo(() => {
     return computeScriptDiff(initialDraftText, finalContent);
@@ -46,6 +49,7 @@ export function SplitEditor({
       });
 
       if (res.success) {
+        setEditSummary(res.editSummary);
         setSavedSuccess(true);
         setTimeout(() => setSavedSuccess(false), 5000);
       }
@@ -154,6 +158,13 @@ export function SplitEditor({
         finalWordCount={diffResult.finalWordCount}
         retainedWordCount={diffResult.retainedWordCount}
       />
+
+      {editSummary && (
+        <div className="rounded-lg border border-border-subtle bg-surface-raised px-4 py-3 text-xs text-slate-300">
+          <span className="font-mono text-brand-amber mr-2">EDIT ANALYSIS</span>
+          {editSummary}
+        </div>
+      )}
 
       {/* Split Screen Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

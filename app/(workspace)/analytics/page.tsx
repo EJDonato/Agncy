@@ -1,12 +1,14 @@
 import { getPostsWithLatestMetrics } from "@/lib/db/queries/posts";
 import { CsvDropzone } from "./_components/csv-dropzone";
 import { PostsTable } from "./_components/posts-table";
+import { getScriptsList } from "@/lib/db/queries/scripts";
 import { BarChart3, TrendingUp, Film, Eye, Sparkles } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
   const posts = await getPostsWithLatestMetrics();
+  const scripts = getScriptsList();
 
   const totalViews = posts.reduce((acc, p) => acc + p.views, 0);
   const totalInteractions = posts.reduce((acc, p) => acc + p.interactions, 0);
@@ -97,7 +99,10 @@ export default async function AnalyticsPage() {
             Showing latest lifetime snapshots
           </span>
         </div>
-        <PostsTable posts={posts} />
+        <PostsTable
+          posts={posts}
+          scripts={scripts.map(({ id, title }) => ({ id, title }))}
+        />
       </div>
     </div>
   );

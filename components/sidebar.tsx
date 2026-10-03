@@ -29,7 +29,10 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 border-r border-border-subtle bg-surface-raised flex flex-col justify-between h-screen sticky top-0">
+    <aside 
+      className="hidden md:flex w-64 border-r border-border-subtle bg-surface-raised flex-col justify-between h-screen sticky top-0 shrink-0"
+      aria-label="Sidebar navigation"
+    >
       <div>
         {/* Brand Header */}
         <div className="h-16 flex items-center px-6 border-b border-border-subtle gap-3">
@@ -43,7 +46,7 @@ export function Sidebar() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="p-3 space-y-1">
+        <nav className="p-3 space-y-1" aria-label="Main navigation">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
@@ -52,8 +55,9 @@ export function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber",
                   isActive
                     ? "bg-surface-subtle text-brand-amber border border-border-strong/60 shadow-sm"
                     : "text-slate-400 hover:text-slate-200 hover:bg-surface-subtle/50"

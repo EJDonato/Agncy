@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, Check, X, Plus, Sparkles, Loader2 } from "lucide-react";
-import { approveStyleRuleAction, rejectStyleRuleAction, createManualRuleAction } from "@/lib/actions/brand";
+import { Shield, Check, X, Plus, Sparkles, Loader2, Pencil } from "lucide-react";
+import { approveStyleRuleAction, rejectStyleRuleAction, createManualRuleAction, editAndApproveStyleRuleAction } from "@/lib/actions/brand";
 
 interface RuleItem {
   id: string;
@@ -55,39 +55,7 @@ export function StyleRulesManager({ rules }: Props) {
           </div>
 
           <div className="space-y-2">
-            {proposedRules.map((rule) => (
-              <div
-                key={rule.id}
-                className="p-3 rounded-lg bg-surface-raised border border-border-subtle flex items-center justify-between gap-3 text-xs"
-              >
-                <div>
-                  <span className="font-mono text-[10px] uppercase px-1.5 py-0.5 rounded bg-surface-subtle text-slate-400 mr-2">
-                    {rule.category}
-                  </span>
-                  <span className="text-slate-200">{rule.ruleText}</span>
-                  {rule.rationale && (
-                    <span className="block text-[11px] text-slate-500 mt-0.5">{rule.rationale}</span>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    onClick={() => approveStyleRuleAction(rule.id)}
-                    className="p-1.5 rounded-md bg-brand-emerald/15 text-brand-emerald hover:bg-brand-emerald/25 transition-colors"
-                    title="Approve & Inject in Prompts"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => rejectStyleRuleAction(rule.id)}
-                    className="p-1.5 rounded-md bg-surface-subtle text-slate-400 hover:text-slate-200 transition-colors"
-                    title="Dismiss"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
+            {proposedRules.map((rule) => <ProposedRuleCard key={rule.id} rule={rule} />)}
           </div>
         </div>
       )}
@@ -159,4 +127,38 @@ export function StyleRulesManager({ rules }: Props) {
       </div>
     </div>
   );
+}
+
+function ProposedRuleCard({ rule }: { rule: RuleItem }) {
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(rule.ruleText);
+  const [category, setCategory] = useState(rule.category);
+  const [saving, setSaving] = useState(false);
+
+  async function saveEditedRule() {
+    setSaving(true);
+    try {
+      await editAndApproveStyleRuleAction({ ruleId: rule.id, ruleText: text, category });
+      setEditing(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return <div className="p-3 rounded-lg bg-surface-raised border border-border-subtle text-xs space-y-2">
+    {editing ? <div className="flex gap-2">
+      <select value={category} onChange={(event) => setCategory(event.target.value as RuleItem["category"])} className="rounded bg-surface-subtle border border-border-subtle px-2">
+        {["hook", "pacing", "vocabulary", "structure", "tone"].map((value) => <option key={value}>{value}</option>)}
+      </select>
+      <input value={text} onChange={(event) => setText(event.target.value)} className="flex-1 rounded bg-surface-subtle border border-border-subtle px-2 py-1" />
+      <button disabled={saving || text.trim().length < 5} onClick={() => void saveEditedRule()} className="text-brand-emerald disabled:opacity-40">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}</button>
+    </div> : <div className="flex items-center justify-between gap-3">
+      <div><span className="font-mono text-[10px] uppercase px-1.5 py-0.5 rounded bg-surface-subtle text-slate-400 mr-2">{rule.category}</span><span className="text-slate-200">{rule.ruleText}</span>{rule.rationale && <span className="block text-[11px] text-slate-500 mt-1">{rule.rationale}</span>}</div>
+      <div className="flex gap-1.5 shrink-0">
+        <button onClick={() => setEditing(true)} title="Edit before approving" className="p-1.5 text-brand-amber"><Pencil className="w-3.5 h-3.5" /></button>
+        <button onClick={() => void approveStyleRuleAction(rule.id)} title="Approve" className="p-1.5 text-brand-emerald"><Check className="w-3.5 h-3.5" /></button>
+        <button onClick={() => void rejectStyleRuleAction(rule.id)} title="Dismiss" className="p-1.5 text-slate-400"><X className="w-3.5 h-3.5" /></button>
+      </div>
+    </div>}
+  </div>;
 }

@@ -1,4 +1,4 @@
-import { Video, UploadCloud, Cpu, Sparkles } from "lucide-react";
+import { UploadCloud, Cpu, Sparkles } from "lucide-react";
 
 export default function StudioPage() {
   return (

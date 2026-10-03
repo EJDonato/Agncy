@@ -1,4 +1,4 @@
-import { FileText, Sparkles } from "lucide-react";
+import { FileText } from "lucide-react";
 import { getScriptsList } from "@/lib/db/queries/scripts";
 import { NewScriptDialog } from "./_components/new-script-dialog";
 import { ScriptCard } from "./_components/script-card";

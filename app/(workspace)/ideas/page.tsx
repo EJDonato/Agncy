@@ -1,4 +1,4 @@
-import { Lightbulb, Search, Sparkles } from "lucide-react";
+import { Lightbulb, Sparkles } from "lucide-react";
 
 export default function IdeasPage() {
   return (
