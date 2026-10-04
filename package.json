@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf .next",
-    "predev": "rm -rf .next",
-    "dev": "next dev",
+    "dev": "node scripts/dev-server.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",

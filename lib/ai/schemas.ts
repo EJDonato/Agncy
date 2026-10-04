@@ -96,30 +96,6 @@ export const ContentIdeasGeminiSchema: Schema = {
   required: ["ideas"],
 };
 
-export const ContentIdeasJsonSchema = {
-  type: "object",
-  additionalProperties: false,
-  properties: {
-    ideas: {
-      type: "array",
-      minItems: 1,
-      maxItems: 6,
-      items: {
-        type: "object",
-        additionalProperties: false,
-        properties: {
-          topic: { type: "string" },
-          angleHook: { type: "string" },
-          whySuggested: { type: "string" },
-          predictedFitScore: { type: "number", minimum: 0, maximum: 1 },
-        },
-        required: ["topic", "angleHook", "whySuggested", "predictedFitScore"],
-      },
-    },
-  },
-  required: ["ideas"],
-} as const;
-
 export const ScriptDraftResponseSchema: Schema = {
   type: Type.OBJECT,
   properties: {

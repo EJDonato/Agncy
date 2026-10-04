@@ -112,7 +112,7 @@ export function ScriptsView({ finalizedIdeas, scripts, initialIdeaId = "" }: Scr
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-mono">
-                  Approved in Content Strategist — click “Draft Script” to write
+                  Approved in Content Strategist — select a card to start writing
                 </p>
               </div>
 
@@ -147,7 +147,7 @@ export function ScriptsView({ finalizedIdeas, scripts, initialIdeaId = "" }: Scr
               <div className="p-6 sm:p-8 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 text-center space-y-1.5 apple-item-enter">
                 <p className="text-xs font-mono font-medium text-slate-600">No scripts generated yet</p>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Click “Draft Script” on any finalized idea above to start your first draft.
+                  Select any finalized idea above to start your first draft.
                 </p>
               </div>
             ) : (

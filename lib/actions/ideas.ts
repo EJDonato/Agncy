@@ -22,6 +22,11 @@ const IdeaIdSchema = z.string().min(1);
 const GenerateIdeasSchema = z.object({
   prompt: z.string().trim().max(1_500, "Your direction must be 1,500 characters or fewer.").optional(),
 });
+const UpdateIdeaSchema = z.object({
+  ideaId: z.string().min(1),
+  topic: z.string().trim().min(3, "The title must be at least 3 characters.").max(500),
+  angleHook: z.string().trim().min(3, "The content angle must be at least 3 characters.").max(500),
+});
 
 function saveGeneratedIdeas(brandId: string, generatedIdeas: ContentIdea[], source: "generated" | "researched") {
   db.transaction((tx) => {
@@ -59,6 +64,17 @@ export async function researchTrendIdeasAction(input?: { prompt?: string }) {
   saveGeneratedIdeas(profile.id, researchedIdeas, "researched");
   revalidatePath("/ideas");
   return { success: true, count: researchedIdeas.length };
+}
+
+export async function updateIdeaAction(input: { ideaId: string; topic: string; angleHook: string }) {
+  const parsed = UpdateIdeaSchema.parse(input);
+  const idea = db.select().from(ideas).where(eq(ideas.id, parsed.ideaId)).get();
+  if (!idea) throw new Error("Content idea not found.");
+  if (idea.status !== "suggested") throw new Error("Only unfinalized content ideas can be edited.");
+
+  db.update(ideas).set({ topic: parsed.topic, angleHook: parsed.angleHook }).where(eq(ideas.id, parsed.ideaId)).run();
+  revalidatePath("/ideas");
+  return { success: true };
 }
 
 export async function finalizeIdeaAction(ideaId: string) {

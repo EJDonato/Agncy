@@ -36,3 +36,4 @@ data/exports/
 scratch/
 
 .playwright-mcp
+.agncy-dev.lock

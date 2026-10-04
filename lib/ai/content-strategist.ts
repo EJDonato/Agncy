@@ -1,7 +1,6 @@
 import { desc, eq } from "drizzle-orm";
-import { getGeminiClient } from "./gemini";
-import { ContentIdeasGeminiSchema, ContentIdeasResponseSchema, type ContentIdea } from "./schemas";
-import { GEMINI_IDEA_MODELS } from "./models";
+import { generateStructuredContentIdeas } from "./content-idea-generator";
+import type { ContentIdea } from "./schemas";
 import { db } from "@/lib/db";
 import { brandProfiles, posts, scripts } from "@/lib/db/schema";
 
@@ -55,24 +54,5 @@ ${getPastContentContext(brandId)}
 
 Return only JSON matching the requested schema.`;
 
-  const ai = getGeminiClient();
-  let rawText = "";
-  let lastError: unknown = null;
-  for (const model of GEMINI_IDEA_MODELS) {
-    try {
-      const response = await ai.models.generateContent({
-        model,
-        contents: prompt,
-        config: { responseMimeType: "application/json", responseSchema: ContentIdeasGeminiSchema },
-      });
-      if (response.text) {
-        rawText = response.text;
-        break;
-      }
-    } catch (error) {
-      lastError = error;
-    }
-  }
-  if (!rawText) throw lastError instanceof Error ? lastError : new Error("Gemini could not generate content ideas.");
-  return ContentIdeasResponseSchema.parse(JSON.parse(rawText)).ideas;
+  return generateStructuredContentIdeas(prompt);
 }
