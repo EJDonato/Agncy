@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { WORKSPACE_NAV_ITEMS } from "@/components/workspace-nav-items";
+import { useWorkspaceNavigation } from "@/components/workspace-navigation";
 
 export function Sidebar() {
-  const pathname = usePathname();
+  const { activePath, beginNavigation } = useWorkspaceNavigation();
 
   return (
     <aside 
@@ -36,13 +36,16 @@ export function Sidebar() {
         <nav className="p-2.5 space-y-0.5" aria-label="Main navigation">
           {WORKSPACE_NAV_ITEMS.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+            const isActive = activePath === item.href || (item.href !== "/" && activePath.startsWith(item.href));
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 prefetch
+                onClick={(event) => {
+                  if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) beginNavigation(item.href);
+                }}
                 title={item.feature}
                 aria-label={`${item.label}: ${item.feature}`}
                 aria-current={isActive ? "page" : undefined}
