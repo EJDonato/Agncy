@@ -18,3 +18,5 @@ export function getFinalizedIdeas() {
     .orderBy(desc(ideas.createdAt))
     .all();
 }
+
+export type FinalizedIdeaItem = ReturnType<typeof getFinalizedIdeas>[number];

@@ -10,7 +10,7 @@ interface GenerateIdeasParams {
   prompt?: string;
 }
 
-function getPastContentContext(brandId: string): string {
+export function getPastContentContext(brandId: string): string {
   const pastPosts = db
     .select({ title: posts.normalizedTitle, fallbackTitle: posts.rawTitle, publishedAt: posts.publishedAt })
     .from(posts)

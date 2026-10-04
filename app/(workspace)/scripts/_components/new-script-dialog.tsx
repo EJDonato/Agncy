@@ -6,50 +6,66 @@ import { createScriptDraftAction } from "@/lib/actions/scripts";
 import { useRouter } from "next/navigation";
 import { PersonaCard } from "@/components/persona-card";
 
-interface FinalizedIdea {
+export interface FinalizedIdeaOption {
   id: string;
   topic: string;
   angleHook: string;
 }
 
 interface NewScriptDialogProps {
-  ideas: FinalizedIdea[];
+  ideas: FinalizedIdeaOption[];
   initialIdeaId?: string;
   defaultOpen?: boolean;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  selectedIdeaId?: string;
+  onSelectIdeaId?: (id: string) => void;
+  hideTrigger?: boolean;
 }
 
-export function NewScriptDialog({ ideas, initialIdeaId = "", defaultOpen = false }: NewScriptDialogProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen || Boolean(initialIdeaId));
+export function NewScriptDialog({
+  ideas,
+  initialIdeaId = "",
+  defaultOpen = false,
+  isOpen: controlledIsOpen,
+  onOpenChange,
+  selectedIdeaId: controlledIdeaId,
+  onSelectIdeaId,
+  hideTrigger = false,
+}: NewScriptDialogProps) {
+  const isControlledOpen = typeof controlledIsOpen === "boolean";
+  const [internalIsOpen, setInternalIsOpen] = useState(defaultOpen || Boolean(initialIdeaId));
+  const isOpen = isControlledOpen ? controlledIsOpen : internalIsOpen;
+
+  const isControlledIdea = typeof controlledIdeaId === "string";
+  const [internalIdeaId, setInternalIdeaId] = useState(initialIdeaId);
+  const ideaId = isControlledIdea ? controlledIdeaId : internalIdeaId;
+
   const [isClosing, setIsClosing] = useState(false);
-  const [ideaId, setIdeaId] = useState(initialIdeaId);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const writerMessage = error
-    ? "That didn’t go through. Adjust the prompt or try once more."
-    : isGenerating
-      ? "I’m drafting it now—tight hook first, then the supporting beats."
-      : ideaId
-        ? "The finalized strategic angle is ready. I’ll turn it into a clear script."
-        : "Choose a finalized content idea first, then I’ll turn it into a script.";
 
   const handleClose = useCallback(() => {
     if (isClosing) return;
     setIsClosing(true);
     setTimeout(() => {
-      setIsOpen(false);
+      if (onOpenChange) {
+        onOpenChange(false);
+      } else {
+        setInternalIsOpen(false);
+      }
       setIsClosing(false);
     }, 180);
-  }, [isClosing]);
+  }, [isClosing, onOpenChange]);
 
   useEffect(() => {
-    if (initialIdeaId) {
-      setIdeaId(initialIdeaId);
-      setIsOpen(true);
+    if (initialIdeaId && !isControlledIdea) {
+      setInternalIdeaId(initialIdeaId);
+      if (!isControlledOpen) setInternalIsOpen(true);
     }
-  }, [initialIdeaId]);
+  }, [initialIdeaId, isControlledIdea, isControlledOpen]);
 
-  // Escape key handler with symmetric exit animation
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape" && isOpen && !isClosing) {
@@ -60,6 +76,14 @@ export function NewScriptDialog({ ideas, initialIdeaId = "", defaultOpen = false
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, isClosing, handleClose]);
 
+  function handleSelectIdea(newId: string) {
+    if (onSelectIdeaId) {
+      onSelectIdeaId(newId);
+    } else {
+      setInternalIdeaId(newId);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsGenerating(true);
@@ -69,7 +93,11 @@ export function NewScriptDialog({ ideas, initialIdeaId = "", defaultOpen = false
     try {
       const res = await createScriptDraftAction(formData);
       if (res.success && res.scriptId) {
-        setIsOpen(false);
+        if (onOpenChange) {
+          onOpenChange(false);
+        } else {
+          setInternalIsOpen(false);
+        }
         router.push(`/scripts/${res.scriptId}`);
       }
     } catch (err: unknown) {
@@ -84,16 +112,23 @@ export function NewScriptDialog({ ideas, initialIdeaId = "", defaultOpen = false
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)} disabled={ideas.length === 0}
-        className="apple-btn-primary min-h-[44px] flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
-      >
-        <Plus className="w-4 h-4" />
-        <span>{ideas.length ? "New Script" : "Finalize an Idea First"}</span>
-      </button>
-
-      <PersonaCard persona="scriptWriter" message={writerMessage} compact />
+      {!hideTrigger && (
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              if (onOpenChange) onOpenChange(true);
+              else setInternalIsOpen(true);
+            }}
+            disabled={ideas.length === 0}
+            className="apple-btn-primary min-h-[44px] flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
+          >
+            <Plus className="w-4 h-4" />
+            <span>{ideas.length ? "New Script" : "Finalize an Idea First"}</span>
+          </button>
+          <PersonaCard persona="scriptWriter" compact />
+        </div>
+      )}
 
       {isOpen && (
         <div 
@@ -135,7 +170,7 @@ export function NewScriptDialog({ ideas, initialIdeaId = "", defaultOpen = false
                   id="script-idea-select"
                   name="ideaId"
                   value={ideaId}
-                  onChange={(e) => setIdeaId(e.target.value)}
+                  onChange={(e) => handleSelectIdea(e.target.value)}
                   required
                   className="w-full min-h-[44px] px-3.5 py-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-[#1f54fc] focus:ring-2 focus:ring-[#1f54fc]/20 transition-all font-mono shadow-sm"
                 >
