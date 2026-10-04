@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { sqliteTable, text, integer, real, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, sqliteTable, text, integer, real, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const brandProfiles = sqliteTable("brand_profiles", {
   id: text("id").primaryKey(),
@@ -83,6 +83,21 @@ export const scriptVersions = sqliteTable("script_versions", {
   fullContent: text("full_content").notNull(),
   createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
 });
+
+export const seraChatTurns = sqliteTable("sera_chat_turns", {
+  id: text("id").primaryKey(),
+  scriptId: text("script_id").notNull().references(() => scripts.id, { onDelete: "cascade" }),
+  userMessage: text("user_message").notNull(),
+  assistantMessage: text("assistant_message"),
+  action: text("action", { enum: ["discuss", "revise"] }),
+  status: text("status", { enum: ["running", "completed", "failed"] }).notNull().default("running"),
+  revisionVersionId: text("revision_version_id").references(() => scriptVersions.id, { onDelete: "set null" }),
+  errorMessage: text("error_message"),
+  createdAt: text("created_at").notNull(),
+  completedAt: text("completed_at"),
+}, (table) => [
+  index("sera_chat_turns_script_created_idx").on(table.scriptId, table.createdAt),
+]);
 
 export const scriptDiffs = sqliteTable("script_diffs", {
   id: text("id").primaryKey(),
