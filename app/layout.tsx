@@ -17,6 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Agncy | In-House Personal Content Studio",
   description: "Local-first, AI-assisted content agency workspace for Elton.",
+  icons: {
+    icon: "/assets/agncy-logo.png",
+    shortcut: "/assets/agncy-logo.png",
+    apple: "/assets/agncy-logo.png",
+  },
 };
 
 export default function RootLayout({

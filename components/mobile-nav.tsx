@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -42,9 +43,15 @@ export function MobileNav() {
   return (
     <header className="md:hidden sticky top-0 z-40 bg-white/85 backdrop-blur-xl border-b border-slate-200/80 h-14 px-4 flex items-center justify-between">
       <div className="flex items-center gap-2.5">
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-b from-brand-amber/20 to-brand-amber/10 border border-brand-amber/30 flex items-center justify-center text-amber-800 font-mono font-bold text-xs shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9)]">
-          A
-        </div>
+        <Image
+          src="/assets/agncy-logo.png"
+          alt="Agncy logo"
+          width={28}
+          height={28}
+          unoptimized
+          priority
+          className="w-7 h-7 object-contain"
+        />
         <div>
           <span className="font-bold tracking-tight text-slate-900 text-sm">Agncy</span>
           <span className="text-[8px] block font-mono tracking-wider text-slate-500 font-medium">STUDIO COCKPIT</span>
@@ -78,9 +85,15 @@ export function MobileNav() {
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-b from-brand-amber/20 to-brand-amber/10 border border-brand-amber/30 flex items-center justify-center text-amber-800 font-mono font-bold text-xs shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9)]">
-                    A
-                  </div>
+                  <Image
+                    src="/assets/agncy-logo.png"
+                    alt="Agncy logo"
+                    width={28}
+                    height={28}
+                    unoptimized
+                    priority
+                    className="w-7 h-7 object-contain"
+                  />
                   <span className="font-bold tracking-tight text-slate-900 text-sm">Agncy</span>
                 </div>
                 <button
