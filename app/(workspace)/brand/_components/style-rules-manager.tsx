@@ -49,9 +49,9 @@ export function StyleRulesManager({ rules }: Props) {
     <div className="space-y-6">
       {/* Proposed Rules Section */}
       {proposedRules.length > 0 && (
-        <div className="apple-glass-card p-5 sm:p-6 rounded-2xl border border-brand-amber/35 bg-amber-50/40 space-y-3.5 shadow-apple-card">
-          <div className="flex items-center justify-between border-b border-brand-amber/25 pb-3">
-            <h3 className="font-semibold text-brand-amber flex items-center gap-2 text-sm tracking-tight">
+        <div className="apple-glass-card p-5 sm:p-6 rounded-2xl border border-[#1f54fc]/30 bg-blue-50/40 space-y-3.5 shadow-apple-card">
+          <div className="flex items-center justify-between border-b border-[#1f54fc]/20 pb-3">
+            <h3 className="font-semibold text-[#1f54fc] flex items-center gap-2 text-sm tracking-tight">
               <Sparkles className="w-4 h-4 shrink-0" />
               <span>Proposed Rules Awaiting Review</span>
             </h3>
@@ -70,7 +70,7 @@ export function StyleRulesManager({ rules }: Props) {
       <div className="apple-glass-card p-5 sm:p-6 rounded-2xl space-y-4 shadow-apple-card">
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <h2 className="font-semibold text-slate-900 flex items-center gap-2 text-sm tracking-tight">
-            <Shield className="w-4 h-4 text-brand-amber shrink-0" />
+            <Shield className="w-4 h-4 text-[#1f54fc] shrink-0" />
             <span>Active Style Rules</span>
           </h2>
           <span className="text-xs font-mono text-brand-emerald font-semibold">{activeRules.length} Active</span>
@@ -89,7 +89,7 @@ export function StyleRulesManager({ rules }: Props) {
               >
                 <Check className="w-4 h-4 text-brand-emerald mt-0.5 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-50 text-brand-amber mr-2 border border-amber-200 font-semibold">
+                  <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-[#1f54fc] mr-2 border border-blue-200 font-semibold">
                     {rule.category}
                   </span>
                   <span className="text-slate-900 font-mono break-words">{rule.ruleText}</span>

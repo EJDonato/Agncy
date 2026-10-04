@@ -44,7 +44,7 @@ export default async function IdeasPage() {
       {/* Ideas Grid */}
       <div className="space-y-4">
         <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 tracking-tight">
-          <Sparkles className="w-4 h-4 text-brand-amber" />
+          <Sparkles className="w-4 h-4 text-[#1f54fc]" />
           <span>Topic Concepts & Seeds ({savedIdeas.length + CURATED_SEEDS.length})</span>
         </h2>
 
@@ -55,7 +55,7 @@ export default async function IdeasPage() {
               className="apple-glass-card p-5 sm:p-6 rounded-2xl flex flex-col justify-between space-y-4 transition-all"
             >
               <div className="space-y-2">
-                <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-brand-amber/10 border border-brand-amber/25 text-brand-amber font-semibold">
+                <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-[#1f54fc] font-semibold">
                   Saved Seed
                 </span>
                 <h3 className="text-sm font-semibold text-slate-900 leading-snug tracking-tight">
@@ -71,10 +71,10 @@ export default async function IdeasPage() {
 
               <Link
                 href={`/scripts?topic=${encodeURIComponent(idea.topic)}`}
-                className="apple-press min-h-[44px] flex items-center justify-between px-4 py-2.5 rounded-xl bg-white hover:bg-amber-50 hover:text-amber-900 border border-slate-200 hover:border-amber-400 text-xs font-mono text-slate-800 font-medium transition-all group shadow-sm"
+                className="apple-press min-h-[44px] flex items-center justify-between px-4 py-2.5 rounded-xl bg-white hover:bg-blue-50 hover:text-blue-900 border border-slate-200 hover:border-[#1f54fc] text-xs font-mono text-slate-800 font-medium transition-all group shadow-sm"
               >
                 <span>Draft Reel Script</span>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-700 group-hover:translate-x-1 transition-all" />
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#1f54fc] group-hover:translate-x-1 transition-all" />
               </Link>
             </div>
           ))}
@@ -101,10 +101,10 @@ export default async function IdeasPage() {
 
               <Link
                 href={`/scripts?topic=${encodeURIComponent(seed.topic)}`}
-                className="apple-press min-h-[44px] flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-amber-50 hover:text-amber-800 border border-slate-200 hover:border-amber-300 text-xs font-mono text-slate-700 transition-all group"
+                className="apple-press min-h-[44px] flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-900 border border-slate-200 hover:border-[#1f54fc] text-xs font-mono text-slate-700 transition-all group"
               >
                 <span>Draft Reel Script</span>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-brand-amber group-hover:translate-x-1 transition-all" />
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#1f54fc] group-hover:translate-x-1 transition-all" />
               </Link>
             </div>
           ))}

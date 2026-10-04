@@ -37,7 +37,7 @@ export function IdeaForm() {
     >
       <div className="flex items-center justify-between text-xs font-mono text-slate-700">
         <div className="flex items-center gap-2">
-          <Lightbulb className="w-4 h-4 text-brand-amber" />
+          <Lightbulb className="w-4 h-4 text-[#1f54fc]" />
           <span className="font-semibold tracking-wider">CAPTURE TOPIC SEED</span>
         </div>
         {success && (
@@ -59,14 +59,14 @@ export function IdeaForm() {
           required
           placeholder="Topic / Premise (e.g. Bakit mabagal ang hotline 911?)"
           aria-label="Idea topic or premise"
-          className="min-h-[44px] px-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 font-mono transition-all shadow-sm"
+          className="min-h-[44px] px-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1f54fc] focus:ring-2 focus:ring-[#1f54fc]/20 font-mono transition-all shadow-sm"
         />
         <input
           name="angleHook"
           required
           placeholder="Hook Angle / Conflict (e.g. Mas mabilis pa mag-reply ang GCash)"
           aria-label="Idea hook angle"
-          className="min-h-[44px] px-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 font-mono transition-all shadow-sm"
+          className="min-h-[44px] px-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1f54fc] focus:ring-2 focus:ring-[#1f54fc]/20 font-mono transition-all shadow-sm"
         />
       </div>
 
@@ -74,7 +74,7 @@ export function IdeaForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="apple-btn-primary min-h-[44px] flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold transition-all disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+          className="apple-btn-primary min-h-[44px] flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold transition-all disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
         >
           {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
           <span>{isSubmitting ? "Saving..." : "Save Topic Seed"}</span>

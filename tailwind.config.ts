@@ -20,7 +20,10 @@ const config: Config = {
           strong: "#CBD5E1",
         },
         brand: {
-          amber: "#D97706",
+          blue: "#1f54fc",
+          purple: "#4726f6",
+          accent: "#1f54fc",
+          amber: "#1f54fc",
           emerald: "#059669",
           rose: "#DC2626",
         },
@@ -37,7 +40,7 @@ const config: Config = {
       boxShadow: {
         "apple-card": "0 2px 14px -2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.9)",
         "apple-glass": "0 12px 32px -4px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 1)",
-        "apple-button": "0 2px 8px rgba(217, 119, 6, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.35)",
+        "apple-button": "0 2px 8px rgba(31, 84, 252, 0.28), inset 0 1px 0 0 rgba(255, 255, 255, 0.35)",
       },
     },
   },

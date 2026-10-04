@@ -47,13 +47,13 @@ export function Sidebar() {
                 aria-label={`${item.label}: ${item.feature}`}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "apple-press flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber",
+                  "apple-press flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]",
                   isActive
-                    ? "bg-amber-50 text-amber-950 font-semibold border border-amber-200 shadow-sm"
+                    ? "bg-blue-50/80 text-blue-950 font-semibold border border-blue-200/80 shadow-sm"
                     : "text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent"
                 )}
               >
-                <Icon className={cn("w-4 h-4 transition-colors", isActive ? "text-amber-600" : "text-slate-400")} />
+                <Icon className={cn("w-4 h-4 transition-colors", isActive ? "text-[#1f54fc]" : "text-slate-400")} />
                 <span>{item.label}</span>
               </Link>
             );

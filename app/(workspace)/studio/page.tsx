@@ -46,7 +46,7 @@ export default function StudioPage() {
         <div className="apple-glass-card p-5 rounded-2xl space-y-1">
           <div className="flex items-center justify-between text-[11px] font-mono tracking-wider text-slate-500">
             <span>HARDWARE ENCODER</span>
-            <Film className="w-4 h-4 text-brand-amber" />
+            <Film className="w-4 h-4 text-[#1f54fc]" />
           </div>
           <div className="text-base font-bold font-mono text-slate-900 tracking-tight">h264_videotoolbox</div>
           <p className="text-xs text-slate-500">Zero-CPU hardware acceleration</p>
@@ -84,10 +84,10 @@ export default function StudioPage() {
             }
           }}
           onClick={() => fileInputRef.current?.click()}
-          className="apple-press border-2 border-dashed border-slate-300 bg-white/60 rounded-2xl p-8 text-center space-y-3 cursor-pointer hover:border-brand-amber/60 hover:bg-amber-50/20 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+          className="apple-press border-2 border-dashed border-slate-300 bg-white/60 rounded-2xl p-8 text-center space-y-3 cursor-pointer hover:border-[#1f54fc]/60 hover:bg-blue-50/20 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
         >
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-b from-brand-amber/20 to-brand-amber/5 border border-brand-amber/25 text-slate-500 flex items-center justify-center mx-auto shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)]">
-            <UploadCloud className="w-7 h-7 text-brand-amber" />
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-b from-[#1f54fc]/15 to-[#4726f6]/5 border border-[#1f54fc]/25 text-slate-500 flex items-center justify-center mx-auto shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)]">
+            <UploadCloud className="w-7 h-7 text-[#1f54fc]" />
           </div>
           <div>
             <h2 className="text-sm sm:text-base font-semibold text-slate-900 tracking-tight">
@@ -115,14 +115,14 @@ export default function StudioPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-200">
           <div>
             <label className="text-[11px] font-mono tracking-wider text-slate-600 font-medium block mb-1.5 flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-brand-amber" />
+              <Sliders className="w-3.5 h-3.5 text-[#1f54fc]" />
               <span>CAPTION STYLE PRESET</span>
             </label>
             <select
               value={preset}
               onChange={(e) => setPreset(e.target.value)}
               aria-label="Caption style preset"
-              className="w-full min-h-[44px] px-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 font-mono focus:outline-none focus:border-brand-amber shadow-sm"
+              className="w-full min-h-[44px] px-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 font-mono focus:outline-none focus:border-[#1f54fc] shadow-sm"
             >
               <option value="bold-amber">THE BOLD FONT (Yellow/Amber Highlight)</option>
               <option value="montserrat-white">Montserrat Heavy (White with Black Outline)</option>

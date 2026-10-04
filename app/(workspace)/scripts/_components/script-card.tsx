@@ -6,7 +6,7 @@ export function ScriptCard({ script }: { script: ScriptListItem }) {
   return (
     <Link
       href={`/scripts/${script.id}`}
-      className="apple-glass-card apple-press group block p-4 sm:p-5 rounded-2xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+      className="apple-glass-card apple-press group block p-4 sm:p-5 rounded-2xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-2 flex-1 min-w-0">
@@ -34,7 +34,7 @@ export function ScriptCard({ script }: { script: ScriptListItem }) {
             )}
           </div>
 
-          <h3 className="text-sm font-semibold text-slate-900 group-hover:text-brand-amber transition-colors truncate tracking-tight">
+          <h3 className="text-sm font-semibold text-slate-900 group-hover:text-[#1f54fc] transition-colors truncate tracking-tight">
             {script.title}
           </h3>
 
@@ -50,7 +50,7 @@ export function ScriptCard({ script }: { script: ScriptListItem }) {
         </div>
 
         <div className="flex items-center justify-end shrink-0">
-          <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-brand-amber group-hover:translate-x-1 transition-all duration-200" />
+          <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#1f54fc] group-hover:translate-x-1 transition-all duration-200" />
         </div>
       </div>
     </Link>

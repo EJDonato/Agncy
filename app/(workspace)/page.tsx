@@ -42,7 +42,7 @@ export default async function DashboardPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/scripts"
-            className="apple-btn-primary min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+            className="apple-btn-primary min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
           >
             <Plus className="w-4 h-4" />
             <span>New Script</span>
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
         <div className="apple-glass-card p-5 rounded-2xl">
           <div className="flex items-center justify-between text-[11px] text-slate-700 font-mono tracking-wider font-semibold">
             <span>AVG REEL RETENTION</span>
-            <TrendingUp className="w-4 h-4 text-amber-600" />
+            <TrendingUp className="w-4 h-4 text-[#1f54fc]" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 tracking-tight">
@@ -89,7 +89,7 @@ export default async function DashboardPage() {
         <div className="apple-glass-card p-5 rounded-2xl">
           <div className="flex items-center justify-between text-[11px] text-slate-700 font-mono tracking-wider font-semibold">
             <span>ACTIVE STYLE RULES</span>
-            <ShieldCheck className="w-4 h-4 text-amber-600" />
+            <ShieldCheck className="w-4 h-4 text-[#4726f6]" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 tracking-tight">
@@ -140,7 +140,7 @@ export default async function DashboardPage() {
               name="topic"
               type="text"
               placeholder="e.g., Bakit nagiging ghost town ang mga barangay tech projects?"
-              className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all font-mono shadow-sm"
+              className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-[#1f54fc] focus:ring-2 focus:ring-[#1f54fc]/20 transition-all font-mono shadow-sm"
             />
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
               <div className="flex gap-2">
@@ -153,7 +153,7 @@ export default async function DashboardPage() {
               </div>
               <button
                 type="submit"
-                className="apple-btn-primary min-h-[44px] px-5 py-2 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+                className="apple-btn-primary min-h-[44px] px-5 py-2 rounded-xl text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
               >
                 Generate Draft →
               </button>
@@ -167,11 +167,11 @@ export default async function DashboardPage() {
           <div className="space-y-2.5">
             <Link
               href="/analytics"
-              className="apple-press min-h-[44px] block p-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber shadow-sm"
+              className="apple-press min-h-[44px] block p-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc] shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-slate-900">Import Meta CSV</span>
-                <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-[#1f54fc] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
               </div>
               <p className="text-xs text-slate-600 mt-1">
                 {posts.length > 0 ? `${posts.length} posts recorded • Drop newer export` : "Drop Meta Business Suite export"}
@@ -180,22 +180,22 @@ export default async function DashboardPage() {
 
             <Link
               href="/studio"
-              className="apple-press min-h-[44px] block p-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber shadow-sm"
+              className="apple-press min-h-[44px] block p-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc] shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-slate-900">Burn Captions Locally</span>
-                <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-[#1f54fc] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
               </div>
               <p className="text-xs text-slate-600 mt-1">Apple Silicon Whisper + VideoToolbox export</p>
             </Link>
 
             <Link
               href="/brand"
-              className="apple-press min-h-[44px] block p-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber shadow-sm"
+              className="apple-press min-h-[44px] block p-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc] shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-slate-900">Review Style Rules</span>
-                <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-[#1f54fc] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
               </div>
               <p className="text-xs text-slate-600 mt-1">Manage the writing preferences Gemini should follow</p>
             </Link>

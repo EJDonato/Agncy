@@ -96,7 +96,7 @@ export function SingleScriptEditor({
           <Link 
             href="/scripts" 
             aria-label="Back to scripts list" 
-            className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber shrink-0 shadow-sm"
+            className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc] shrink-0 shadow-sm"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
@@ -115,7 +115,7 @@ export function SingleScriptEditor({
             onClick={() => setContent(aiBaseline)} 
             disabled={content === aiBaseline || isRevising} 
             aria-label="Reset content to initial draft"
-            className="apple-press min-h-[44px] px-3.5 rounded-xl border border-slate-200 bg-white text-xs font-mono text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-40 transition-all flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber shadow-sm"
+            className="apple-press min-h-[44px] px-3.5 rounded-xl border border-slate-200 bg-white text-xs font-mono text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-40 transition-all flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc] shadow-sm"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset</span>
@@ -124,7 +124,7 @@ export function SingleScriptEditor({
             type="button" 
             onClick={() => void handleSave()} 
             disabled={isSaving || isRevising || !content.trim()} 
-            className="apple-btn-primary min-h-[44px] px-5 rounded-xl text-xs disabled:opacity-50 disabled:pointer-events-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+            className="apple-btn-primary min-h-[44px] px-5 rounded-xl text-xs disabled:opacity-50 disabled:pointer-events-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
           >
             {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             <span>{isSaving ? "Saving..." : "Save Script"}</span>
@@ -134,9 +134,9 @@ export function SingleScriptEditor({
 
       <div aria-live="polite">
         <PersonaCard persona="scriptWriter" message={writerMessage} compact />
-        <form onSubmit={handleRevision} className="flex flex-col sm:flex-row gap-2 rounded-2xl border border-brand-amber/30 bg-amber-50/60 backdrop-blur-xl p-3 sm:p-3.5 shadow-sm">
+        <form onSubmit={handleRevision} className="flex flex-col sm:flex-row gap-2 rounded-2xl border border-[#1f54fc]/30 bg-blue-50/50 backdrop-blur-xl p-3 sm:p-3.5 shadow-sm">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <Sparkles className="w-4 h-4 text-brand-amber shrink-0 ml-1" />
+            <Sparkles className="w-4 h-4 text-[#1f54fc] shrink-0 ml-1" />
             <input
               value={instruction}
               onChange={(event) => {
@@ -183,7 +183,7 @@ export function SingleScriptEditor({
           disabled={isRevising} 
           aria-label="Editable script draft" 
           spellCheck={false} 
-          className="w-full min-h-[380px] sm:min-h-[520px] p-5 sm:p-6 bg-white text-xs sm:text-sm text-slate-900 font-mono leading-relaxed resize-y focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-amber/50 disabled:opacity-60" 
+          className="w-full min-h-[380px] sm:min-h-[520px] p-5 sm:p-6 bg-white text-xs sm:text-sm text-slate-900 font-mono leading-relaxed resize-y focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[#1f54fc]/50 disabled:opacity-60" 
         />
       </section>
     </div>

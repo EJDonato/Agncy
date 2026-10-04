@@ -61,7 +61,7 @@ export function MobileNav() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+        className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
         aria-expanded={isOpen}
         aria-label="Open main navigation menu"
       >
@@ -99,7 +99,7 @@ export function MobileNav() {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+                  className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
                   aria-label="Close navigation menu"
                 >
                   <X className="w-5 h-5" />
@@ -120,13 +120,13 @@ export function MobileNav() {
                       aria-label={`${item.label}: ${item.feature}`}
                       aria-current={isActive ? "page" : undefined}
                       className={cn(
-                        "apple-press min-h-[44px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber",
+                        "apple-press min-h-[44px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]",
                         isActive
-                          ? "bg-gradient-to-r from-brand-amber/15 via-brand-amber/10 to-transparent text-amber-900 border border-brand-amber/30 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9)]"
+                          ? "bg-gradient-to-r from-blue-500/15 via-blue-500/10 to-transparent text-blue-950 border border-blue-500/30 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9)]"
                           : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent"
                       )}
                     >
-                      <Icon className={cn("w-4 h-4", isActive ? "text-amber-700" : "text-slate-500")} />
+                      <Icon className={cn("w-4 h-4", isActive ? "text-[#1f54fc]" : "text-slate-500")} />
                       <span>{item.label}</span>
                     </Link>
                   );

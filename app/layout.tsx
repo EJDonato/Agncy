@@ -31,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="bg-canvas text-slate-900 min-h-screen font-sans antialiased selection:bg-brand-amber/25 selection:text-amber-950">
+      <body className="bg-canvas text-slate-900 min-h-screen font-sans antialiased selection:bg-[#1f54fc]/15 selection:text-[#1f54fc]">
         {children}
       </body>
     </html>

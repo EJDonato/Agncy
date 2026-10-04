@@ -42,9 +42,9 @@ export default async function CalendarPage() {
         <div className="apple-glass-card p-5 rounded-2xl">
           <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono tracking-wider">
             <span>IN DRAFTING</span>
-            <FileText className="w-4 h-4 text-brand-amber" />
+            <FileText className="w-4 h-4 text-[#1f54fc]" />
           </div>
-          <div className="mt-2 text-2xl font-bold font-mono text-brand-amber tracking-tight">
+          <div className="mt-2 text-2xl font-bold font-mono text-[#1f54fc] tracking-tight">
             {inDraftScripts.length}
           </div>
           <p className="text-xs text-slate-500 mt-1">Active script drafts being edited</p>
@@ -65,13 +65,13 @@ export default async function CalendarPage() {
       {/* Filming Queue Section */}
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 tracking-tight">
-          <CalendarIcon className="w-4 h-4 text-brand-amber" />
+          <CalendarIcon className="w-4 h-4 text-[#1f54fc]" />
           <span>Filming & Production Queue</span>
         </h2>
 
         {finalizedScripts.length === 0 ? (
           <div className="apple-glass-card p-6 sm:p-8 rounded-2xl text-center text-xs text-slate-500 font-mono">
-            No scripts marked as finalized yet. Finalize a script draft in <Link href="/scripts" className="text-brand-amber underline">Script Studio</Link> to queue it for filming.
+            No scripts marked as finalized yet. Finalize a script draft in <Link href="/scripts" className="text-[#1f54fc] underline hover:text-[#4726f6]">Script Studio</Link> to queue it for filming.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -92,7 +92,7 @@ export default async function CalendarPage() {
                     </span>
                   )}
                 </div>
-                <h3 className="text-sm font-semibold text-slate-900 group-hover:text-brand-amber transition-colors mt-2.5 truncate tracking-tight">
+                <h3 className="text-sm font-semibold text-slate-900 group-hover:text-[#1f54fc] transition-colors mt-2.5 truncate tracking-tight">
                   {script.title}
                 </h3>
                 <p className="text-xs text-slate-500 mt-1 font-mono">
@@ -107,20 +107,20 @@ export default async function CalendarPage() {
       {/* Recent Drops Timeline */}
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 tracking-tight">
-          <Film className="w-4 h-4 text-brand-amber" />
+          <Film className="w-4 h-4 text-[#1f54fc]" />
           <span>Recent Published Posts Timeline</span>
         </h2>
 
         {posts.length === 0 ? (
           <div className="apple-glass-card p-6 sm:p-8 rounded-2xl text-center text-xs text-slate-500 font-mono">
-            No published posts imported. Import a Meta CSV in <Link href="/analytics" className="text-brand-amber underline">Analytics</Link> to see your timeline.
+            No published posts imported. Import a Meta CSV in <Link href="/analytics" className="text-[#1f54fc] underline hover:text-[#4726f6]">Analytics</Link> to see your timeline.
           </div>
         ) : (
           <div className="apple-glass-card rounded-2xl divide-y divide-slate-200 overflow-hidden">
             {posts.slice(0, 8).map((post) => (
               <div key={post.id} className="p-4 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs hover:bg-slate-50/80 transition-colors">
                 <div className="min-w-0 flex items-center gap-3">
-                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-brand-amber font-semibold shrink-0">
+                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-[#1f54fc] font-semibold shrink-0">
                     {post.postType || "Post"}
                   </span>
                   <span className="font-medium text-slate-900 truncate">

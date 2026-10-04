@@ -66,9 +66,9 @@ export default async function AnalyticsPage() {
         <div className="apple-glass-card p-5 rounded-2xl">
           <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono tracking-wider">
             <span>TOP REEL VIEWS</span>
-            <TrendingUp className="w-4 h-4 text-brand-amber" />
+            <TrendingUp className="w-4 h-4 text-[#1f54fc]" />
           </div>
-          <div className="mt-2 text-2xl font-bold font-mono text-brand-amber tracking-tight">
+          <div className="mt-2 text-2xl font-bold font-mono text-[#1f54fc] tracking-tight">
             {topReel ? `${topReel.views.toLocaleString()} views` : "--"}
           </div>
           <p className="text-xs text-slate-500 mt-1">
@@ -95,7 +95,7 @@ export default async function AnalyticsPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-slate-900 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-brand-amber" />
+            <BarChart3 className="w-4 h-4 text-[#1f54fc]" />
             Ingested Content History
           </h2>
           <span className="text-xs text-slate-500 font-mono">

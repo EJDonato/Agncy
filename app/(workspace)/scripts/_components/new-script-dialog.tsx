@@ -68,7 +68,7 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="apple-btn-primary min-h-[44px] flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+        className="apple-btn-primary min-h-[44px] flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
       >
         <Plus className="w-4 h-4" />
         <span>New Script</span>
@@ -92,14 +92,14 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
           >
             <div className="flex items-center justify-between border-b border-slate-200 pb-3.5">
               <h2 id="new-script-dialog-title" className="font-semibold text-slate-900 flex items-center gap-2.5 text-sm tracking-tight">
-                <Sparkles className="w-4 h-4 text-brand-amber shrink-0" />
+                <Sparkles className="w-4 h-4 text-[#1f54fc] shrink-0" />
                 <span>Draft New Script with Gemini</span>
               </h2>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
                 aria-label="Close dialog"
-                className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber"
+                className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -118,7 +118,7 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
                   required
                   rows={3}
                   placeholder="e.g. Bakit nagiging ghost town ang civic apps kahit may funding?"
-                  className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 transition-all font-mono shadow-sm"
+                  className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1f54fc] focus:ring-2 focus:ring-[#1f54fc]/20 transition-all font-mono shadow-sm"
                 />
               </div>
 
@@ -129,7 +129,7 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
                     id="script-format-select"
                     name="format"
                     defaultValue="Reel"
-                    className="w-full min-h-[44px] px-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-brand-amber font-mono shadow-sm"
+                    className="w-full min-h-[44px] px-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-[#1f54fc] font-mono shadow-sm"
                   >
                     <option value="Reel">Reel (9:16 Vertical)</option>
                     <option value="Short">YouTube Short</option>
@@ -145,7 +145,7 @@ export function NewScriptDialog({ initialTopic = "", defaultOpen = false }: NewS
                     id="script-duration-select"
                     name="targetDurationSec"
                     defaultValue="45"
-                    className="w-full min-h-[44px] px-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-brand-amber font-mono shadow-sm"
+                    className="w-full min-h-[44px] px-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-[#1f54fc] font-mono shadow-sm"
                   >
                     <option value="30">~30 seconds</option>
                     <option value="45">~45 seconds (Recommended)</option>

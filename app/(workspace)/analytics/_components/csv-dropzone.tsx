@@ -76,8 +76,8 @@ export function CsvDropzone() {
         onClick={() => fileInputRef.current?.click()}
         className={`apple-press p-6 sm:p-9 rounded-2xl border-2 border-dashed transition-all cursor-pointer text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber ${
           isDragging
-            ? "border-brand-amber/80 bg-brand-amber/10 shadow-[0_0_24px_rgba(245,158,11,0.2)]"
-            : "border-slate-300 bg-white/70 backdrop-blur-xl hover:border-brand-amber/60 hover:bg-amber-50/20 shadow-apple-card"
+            ? "border-brand-amber/80 bg-brand-amber/10 shadow-[0_0_24px_rgba(31,84,252,0.2)]"
+            : "border-slate-300 bg-white/70 backdrop-blur-xl hover:border-brand-amber/60 hover:bg-blue-50/20 shadow-apple-card"
         }`}
       >
         <input

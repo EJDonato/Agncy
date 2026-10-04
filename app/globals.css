@@ -19,14 +19,14 @@ body {
   overflow-x: hidden;
 }
 
-/* Polished input caret color matching studio amber */
+/* Polished input caret color matching studio electric blue */
 input, textarea {
-  caret-color: #D97706;
+  caret-color: #1f54fc;
 }
 
 /* Accessible focus ring default for keyboard navigation */
 :focus-visible {
-  outline: 2px solid #D97706;
+  outline: 2px solid #1f54fc;
   outline-offset: 2px;
 }
 
@@ -57,22 +57,22 @@ input, textarea {
   box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.07), 0 2px 6px 0 rgba(0, 0, 0, 0.03);
 }
 
-/* Apple Pro amber button style */
+/* Apple Pro button style (Blue to Purple accent gradient) */
 .apple-btn-primary {
-  background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%);
+  background: linear-gradient(135deg, #1f54fc 0%, #4726f6 100%);
   color: #FFFFFF;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.28), inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+  box-shadow: 0 2px 8px rgba(31, 84, 252, 0.28), inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
   transition: transform 120ms cubic-bezier(0.25, 1, 0.5, 1), filter 120ms ease-out, box-shadow 150ms ease-out;
 }
 .apple-btn-primary:hover {
-  filter: brightness(1.04);
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+  filter: brightness(1.06);
+  box-shadow: 0 4px 14px rgba(71, 38, 246, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
 }
 .apple-btn-primary:active {
   transform: scale(0.97);
   filter: brightness(0.95);
-  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 1px 3px rgba(31, 84, 252, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
 }
 
 /* Custom Scrollbars for High-Density Studio View */

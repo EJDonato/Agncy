@@ -53,7 +53,7 @@ export function PostsTable({ posts, scripts }: Props) {
               onClick={() => setFilterType(type)}
               className={`apple-press min-h-11 px-4 rounded-xl text-xs font-mono font-medium shrink-0 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber ${
                 filterType === type
-                  ? "bg-brand-amber/15 text-brand-amber border border-brand-amber/30 shadow-[inset_0_1px_0_0_rgba(245,158,11,0.15)] font-semibold"
+                  ? "bg-blue-50 text-[#1f54fc] border border-blue-200/80 shadow-[inset_0_1px_0_0_rgba(31,84,252,0.15)] font-semibold"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent"
               }`}
             >

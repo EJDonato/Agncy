@@ -26,7 +26,7 @@ export default async function ScriptsPage({ searchParams }: ScriptsPageProps) {
 
       {scriptList.length === 0 ? (
         <div className="apple-glass-card p-8 sm:p-12 rounded-2xl text-center space-y-3.5">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-b from-brand-amber/20 to-brand-amber/5 border border-brand-amber/30 text-brand-amber flex items-center justify-center mx-auto shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)]">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-b from-[#1f54fc]/15 to-[#4726f6]/5 border border-[#1f54fc]/30 text-[#1f54fc] flex items-center justify-center mx-auto shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)]">
             <FileText className="w-7 h-7" />
           </div>
           <h2 className="text-base font-semibold text-slate-900 tracking-tight">No Scripts Created Yet</h2>
