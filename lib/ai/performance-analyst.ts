@@ -2,13 +2,14 @@ import { getGeminiClient } from "./gemini";
 import { GEMINI_ANALYST_MODELS } from "./models";
 import { PerformanceAnalysisGeminiSchema, PerformanceAnalysisSchema, type PerformanceAnalysis } from "./schemas";
 import type { PostWithLatestMetrics } from "@/lib/db/queries/posts";
+import type { ContextSignal } from "./context-schemas";
 
 export interface PerformanceCreatorContext {
   creatorName: string;
   niche: string;
   targetAudience: string;
   toneOfVoice: string;
-  currentConstraints?: string;
+  verifiedSignals: ContextSignal[];
 }
 
 function titleFor(post: PostWithLatestMetrics): string {
@@ -38,7 +39,8 @@ Current date: ${new Date().toISOString().slice(0, 10)}
 Creator niche: ${context.niche}
 Target audience: ${context.targetAudience}
 Brand voice: ${context.toneOfVoice}
-Current creator context and constraints: ${context.currentConstraints || "No additional current constraints were supplied."}
+Automatically verified freshness context:
+${context.verifiedSignals.length ? context.verifiedSignals.map((signal) => `- ${signal.subject}: ${signal.status}. ${signal.evidenceSummary}${signal.sourceUrl ? ` Source: ${signal.sourceUrl}` : ""}`).join("\n") : "- No specific time-sensitive programs or opportunities were detected in the strongest posts."}
 
 Analyze only the supplied post dataset. Find semantic similarities across titles, hooks, themes, formats, and measurable outcomes. Give practical, testable next steps.
 
@@ -52,6 +54,7 @@ Strict rules:
 - Do not recommend repeating applications, deadlines, financial assistance, events, campaigns, or programs that may have ended. Unless the current creator context explicitly confirms they are active, generalize the reusable mechanism into an evergreen or currently actionable idea.
 - Use each post's publication date to recognize that older time-sensitive topics may no longer be actionable.
 - If a recommendation depends on a program still being active, say it must be verified instead of presenting it as a next experiment.
+- Never recommend a subject classified as ended or recurring_closed. Extract its reusable creative mechanism and apply that mechanism to an evergreen need or verified active subject instead.
 
 Posts, newest first:
 ${postData(posts)}
@@ -66,7 +69,11 @@ Return only JSON matching the requested schema.`;
       const response = await ai.models.generateContent({
         model,
         contents: prompt,
-        config: { responseMimeType: "application/json", responseSchema: PerformanceAnalysisGeminiSchema },
+        config: {
+          httpOptions: { timeout: 120_000 },
+          responseMimeType: "application/json",
+          responseSchema: PerformanceAnalysisGeminiSchema,
+        },
       });
       if (response.text) {
         responseText = response.text;

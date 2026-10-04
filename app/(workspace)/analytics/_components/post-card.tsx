@@ -16,6 +16,7 @@ import {
   Users,
 } from "lucide-react";
 import type { PostWithLatestMetrics } from "@/lib/db/queries/posts";
+import { formatMetaPublishDateTime } from "@/lib/analytics/meta-publish-time";
 import { PostEmbed } from "./post-embed";
 
 export function PostCard({ post, index = 0 }: { post: PostWithLatestMetrics; index?: number }) {
@@ -62,13 +63,7 @@ export function PostCard({ post, index = 0 }: { post: PostWithLatestMetrics; ind
             </div>
 
             <time className="text-[11px] font-mono text-slate-500" dateTime={post.publishedAt}>
-              {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              {formatMetaPublishDateTime(post.publishedAt)}
             </time>
           </div>
 

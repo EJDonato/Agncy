@@ -7,6 +7,7 @@ import { deleteScheduleAction, updateScheduleStatusAction } from "@/lib/actions/
 import type { PostWithLatestMetrics } from "@/lib/db/queries/posts";
 import type { ContentScheduleItem } from "@/lib/db/queries/schedules";
 import type { RecommendedSlot } from "@/lib/calendar/schedule-analyzer";
+import { formatMetaPublishTime } from "@/lib/analytics/meta-publish-time";
 
 interface DayDetailPanelProps {
   dateStr: string; // YYYY-MM-DD
@@ -206,7 +207,7 @@ export function DayDetailPanel({
                       {post.postType || "Post"}
                     </span>
                     <span className="text-[11px] text-slate-500">
-                      {new Date(post.publishedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                      {formatMetaPublishTime(post.publishedAt)}
                     </span>
                   </div>
                   <p className="font-sans font-medium text-slate-900 line-clamp-2">

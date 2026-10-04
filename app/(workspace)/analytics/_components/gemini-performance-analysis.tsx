@@ -1,27 +1,82 @@
 "use client";
 
-import { Loader2, Sparkles } from "lucide-react";
-import { useState } from "react";
-import { generatePerformanceAnalysisAction } from "@/lib/actions/analytics";
-import type { PerformanceAnalysis } from "@/lib/ai/schemas";
+import { CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { PerformanceAnalysisJob } from "@/lib/analytics/performance-analysis-contract";
+
+const POLL_INTERVAL_MS = 2_000;
+const JOB_ENDPOINT = "/api/analytics/performance-analysis";
+
+async function requestJob(url: string, init?: RequestInit): Promise<PerformanceAnalysisJob | null> {
+  const response = await fetch(url, { cache: "no-store", ...init });
+  const { PerformanceAnalysisApiResponseSchema } = await import("@/lib/analytics/performance-analysis-contract");
+  const payload = PerformanceAnalysisApiResponseSchema.parse(await response.json());
+  if (!payload.success) throw new Error(payload.error);
+  return payload.job;
+}
 
 export function GeminiPerformanceAnalysis() {
-  const [analysis, setAnalysis] = useState<PerformanceAnalysis | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [job, setJob] = useState<PerformanceAnalysisJob | null>(null);
+  const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentConstraints, setCurrentConstraints] = useState("");
+  const isAnalyzing = job?.status === "queued" || job?.status === "running";
+  const activeJobId = isAnalyzing ? job.id : null;
+
+  useEffect(() => {
+    let cancelled = false;
+    void requestJob(JOB_ENDPOINT)
+      .then((latestJob) => {
+        if (!cancelled) setJob(latestJob);
+      })
+      .catch(() => {
+        if (!cancelled) setError("Could not restore the latest analysis status.");
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!activeJobId) return;
+    const jobId = activeJobId;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    async function poll() {
+      try {
+        const updatedJob = await requestJob(`${JOB_ENDPOINT}?id=${encodeURIComponent(jobId)}`);
+        if (cancelled || !updatedJob) return;
+        setJob(updatedJob);
+        if (updatedJob.status === "queued" || updatedJob.status === "running") {
+          timer = setTimeout(poll, POLL_INTERVAL_MS);
+        }
+      } catch {
+        if (!cancelled) timer = setTimeout(poll, POLL_INTERVAL_MS);
+      }
+    }
+
+    timer = setTimeout(poll, POLL_INTERVAL_MS);
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [activeJobId]);
 
   async function runAnalysis() {
-    setIsAnalyzing(true);
+    setIsStarting(true);
     setError(null);
     try {
-      setAnalysis(await generatePerformanceAnalysisAction({ currentConstraints: currentConstraints.trim() || undefined }));
+      const startedJob = await requestJob(JOB_ENDPOINT, { method: "POST" });
+      if (!startedJob) throw new Error("The analysis job could not be started.");
+      setJob(startedJob);
     } catch (analysisError) {
       setError(analysisError instanceof Error ? analysisError.message : "Gemini could not analyze performance right now.");
     } finally {
-      setIsAnalyzing(false);
+      setIsStarting(false);
     }
   }
+
+  const displayedError = error || (job?.status === "failed" ? job.error : null);
+  const analysis = job?.analysis;
+  const contextSummary = job?.context;
 
   return (
     <section className="rounded-2xl border border-[#1f54fc]/25 bg-blue-50/50 p-5 sm:p-6 shadow-sm">
@@ -32,44 +87,53 @@ export function GeminiPerformanceAnalysis() {
             <span>Gemini pattern analysis</span>
           </h3>
           <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-600">
-            Use Gemini to compare similar themes, hooks, formats, and outcomes across your imported posts. Results cite the available data and recommend experiments—not guarantees.
+            Axiom compares themes, hooks, formats, and outcomes, then automatically verifies whether time-sensitive opportunities are still actionable before recommending experiments.
           </p>
         </div>
         <button
           type="button"
           onClick={() => void runAnalysis()}
-          disabled={isAnalyzing}
+          disabled={isStarting || isAnalyzing}
           className={`apple-btn-primary flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-xl px-5 text-xs disabled:opacity-50 ${
-            isAnalyzing ? "apple-btn-generating" : ""
+            isStarting || isAnalyzing ? "apple-btn-generating" : ""
           }`}
         >
-          {isAnalyzing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-          <span>{isAnalyzing ? "Analyzing..." : "Analyze"}</span>
+          {isStarting || isAnalyzing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+          <span>{isStarting ? "Starting..." : isAnalyzing ? "Analyzing..." : analysis ? "Analyze again" : "Analyze"}</span>
         </button>
       </div>
 
-      <label className="mt-5 block">
-        <span className="mb-1.5 block text-[10px] font-mono font-semibold tracking-wider text-slate-600">CURRENT CONTEXT &amp; CONSTRAINTS</span>
-        <textarea
-          value={currentConstraints}
-          onChange={(event) => { setCurrentConstraints(event.target.value); setAnalysis(null); }}
-          maxLength={1_500}
-          rows={3}
-          disabled={isAnalyzing}
-          placeholder="e.g. The financial-assistance application period has ended. Focus on evergreen civic-tech topics and currently active opportunities."
-          className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-xs font-mono leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-[#1f54fc] focus:outline-none focus:ring-2 focus:ring-[#1f54fc]/20 disabled:opacity-50"
-        />
-        <span className="mt-1.5 block text-[11px] text-slate-500">Optional. Add expired programs, current priorities, or topics you cannot act on.</span>
-      </label>
+      {isAnalyzing && (
+        <div role="status" aria-live="polite" className="mt-4 flex items-start gap-2 rounded-xl border border-[#1f54fc]/20 bg-white/70 p-3 text-xs text-slate-600 apple-item-enter">
+          <Loader2 className="mt-0.5 h-3.5 w-3.5 shrink-0 animate-spin text-[#1f54fc]" />
+          <span>Analysis is running in the background. You can use the rest of Agncy or leave this page; the result will be here when you return.</span>
+        </div>
+      )}
 
-      {error && (
+      {job?.status === "completed" && analysis && (
+        <div role="status" className="mt-4 flex items-center gap-2 rounded-xl border border-brand-emerald/25 bg-brand-emerald/5 p-3 text-xs text-emerald-800 apple-item-enter">
+          <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+          <span>Background analysis completed.</span>
+        </div>
+      )}
+
+      {displayedError && (
         <div role="alert" className="mt-4 rounded-xl border border-brand-rose/30 bg-brand-rose/10 p-3 text-xs font-mono text-brand-rose apple-item-enter">
-          {error}
+          {displayedError}
         </div>
       )}
 
       {analysis && (
         <div className="mt-5 space-y-4 apple-item-enter">
+          {contextSummary && (
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-slate-200 bg-white/70 px-3.5 py-2.5 text-[11px] font-mono text-slate-600">
+              <span className="font-semibold text-slate-800">Context verified automatically</span>
+              <span>{contextSummary.activeCount} active or evergreen</span>
+              <span>{contextSummary.excludedCount} expired topics excluded</span>
+              {contextSummary.unclearCount > 0 && <span>{contextSummary.unclearCount} require verification</span>}
+              <time className="sm:ml-auto" dateTime={contextSummary.checkedAt}>{new Date(contextSummary.checkedAt).toLocaleString()}</time>
+            </div>
+          )}
           <p className="text-sm leading-relaxed text-slate-800 font-medium">
             {analysis.executiveSummary}
           </p>

@@ -41,10 +41,12 @@ export function PostingStrategyBanner({ insights, onScheduleNext }: PostingStrat
         </div>
         <div>
           <div className="text-base font-bold text-slate-900 tracking-tight font-mono">
-            {insights.peakTime} (Local)
+            {insights.peakTime} (Meta export)
           </div>
           <p className="text-[11px] text-slate-500 mt-0.5 font-mono">
-            Peak viewer retention window
+            {insights.peakTimePostCount > 0
+              ? `${insights.peakTimeAvgViews.toLocaleString()} avg views across ${insights.peakTimePostCount} posts`
+              : "Planning baseline until history is available"}
           </p>
         </div>
       </div>

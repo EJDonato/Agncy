@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const brandProfiles = sqliteTable("brand_profiles", {
   id: text("id").primaryKey(),
@@ -33,6 +33,31 @@ export const ideas = sqliteTable("ideas", {
   status: text("status", { enum: ["suggested", "saved", "converted", "dismissed"] }).notNull().default("suggested"),
   predictedFitScore: real("predicted_fit_score").default(0.8),
   createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+export const contextSignals = sqliteTable("context_signals", {
+  id: text("id").primaryKey(),
+  brandId: text("brand_id").notNull().references(() => brandProfiles.id, { onDelete: "cascade" }),
+  subject: text("subject").notNull(),
+  normalizedSubject: text("normalized_subject").notNull(),
+  status: text("status", { enum: ["active", "ended", "evergreen", "recurring_closed", "unclear"] }).notNull(),
+  evidenceSummary: text("evidence_summary").notNull(),
+  sourceUrl: text("source_url"),
+  checkedAt: text("checked_at").notNull(),
+  expiresAt: text("expires_at").notNull(),
+}, (table) => [
+  uniqueIndex("context_signals_brand_subject_idx").on(table.brandId, table.normalizedSubject),
+]);
+
+export const performanceAnalysisJobs = sqliteTable("performance_analysis_jobs", {
+  id: text("id").primaryKey(),
+  status: text("status", { enum: ["queued", "running", "completed", "failed"] }).notNull(),
+  analysisJson: text("analysis_json"),
+  contextJson: text("context_json"),
+  errorMessage: text("error_message"),
+  createdAt: text("created_at").notNull(),
+  startedAt: text("started_at"),
+  completedAt: text("completed_at"),
 });
 
 export const scripts = sqliteTable("scripts", {

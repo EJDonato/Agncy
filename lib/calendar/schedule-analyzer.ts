@@ -1,4 +1,5 @@
 import type { PostWithLatestMetrics } from "@/lib/db/queries/posts";
+import { getMetaPublishDay, getMetaPublishHour } from "@/lib/analytics/meta-publish-time";
 
 export interface DayPerformance {
   dayOfWeek: number; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
@@ -24,28 +25,63 @@ export interface PostingStrategyInsights {
   bestDays: DayPerformance[];
   recommendedCadence: string;
   peakTime: string;
+  peakTimePostCount: number;
+  peakTimeAvgViews: number;
   topFormat: string;
   nextRecommendedSlot: RecommendedSlot | null;
 }
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+interface HourPerformance {
+  hour: number;
+  postCount: number;
+  avgViews: number;
+}
+
+function rankHours(samples: { hour: number; views: number }[]): HourPerformance[] {
+  const buckets = new Map<number, number[]>();
+  for (const sample of samples) {
+    const views = buckets.get(sample.hour) ?? [];
+    views.push(sample.views);
+    buckets.set(sample.hour, views);
+  }
+
+  const stats = [...buckets].map(([hour, views]) => ({
+    hour,
+    postCount: views.length,
+    avgViews: Math.round(views.reduce((sum, value) => sum + value, 0) / views.length),
+  }));
+  const repeated = stats.filter((stat) => stat.postCount >= 2);
+  return (repeated.length > 0 ? repeated : stats).sort(
+    (a, b) => b.avgViews - a.avgViews || b.postCount - a.postCount || a.hour - b.hour
+  );
+}
+
+function formatHour(hour: number | undefined): string {
+  return `${String(hour ?? 19).padStart(2, "0")}:00`;
+}
+
 export function analyzePostingStrategy(
   posts: PostWithLatestMetrics[],
   referenceDate: Date = new Date()
 ): PostingStrategyInsights {
   // Group historical posts by day of the week
-  const dayBuckets: { views: number[]; hours: number[] }[] = Array.from({ length: 7 }, () => ({
+  const dayBuckets: { views: number[]; hourSamples: { hour: number; views: number }[] }[] = Array.from({ length: 7 }, () => ({
     views: [],
-    hours: [],
+    hourSamples: [],
   }));
+  const allHourSamples: { hour: number; views: number }[] = [];
 
   for (const post of posts) {
     const d = new Date(post.publishedAt);
     if (isNaN(d.getTime())) continue;
-    const day = d.getDay();
-    dayBuckets[day].views.push(post.views || 0);
-    dayBuckets[day].hours.push(d.getHours());
+    const day = getMetaPublishDay(d);
+    const hour = getMetaPublishHour(d);
+    const views = post.views || 0;
+    dayBuckets[day].views.push(views);
+    dayBuckets[day].hourSamples.push({ hour, views });
+    allHourSamples.push({ hour, views });
   }
 
   // Calculate stats for each day
@@ -54,18 +90,7 @@ export function analyzePostingStrategy(
     const totalViews = bucket.views.reduce((a, b) => a + b, 0);
     const avgViews = postCount > 0 ? Math.round(totalViews / postCount) : 0;
 
-    // Find most frequent hour or fallback to 19:00
-    let bestHour = "19:00";
-    if (bucket.hours.length > 0) {
-      const hourCounts: Record<number, number> = {};
-      for (const h of bucket.hours) {
-        hourCounts[h] = (hourCounts[h] || 0) + 1;
-      }
-      const topHour = Object.entries(hourCounts).sort((a, b) => b[1] - a[1])[0];
-      if (topHour) {
-        bestHour = `${String(topHour[0]).padStart(2, "0")}:00`;
-      }
-    }
+    const bestHour = formatHour(rankHours(bucket.hourSamples)[0]?.hour);
 
     return {
       dayOfWeek: dayIdx,
@@ -103,9 +128,9 @@ export function analyzePostingStrategy(
     d.isRecommended = recommendedDayIndices.has(d.dayOfWeek);
   });
 
-  // Find peak hour overall
-  const topDay = ranked[0] || dayStats[4];
-  const peakTime = topDay.bestHour || "19:00";
+  // Rank publish hours by average views. Ignore one-off hours when repeated samples exist.
+  const topHour = rankHours(allHourSamples)[0];
+  const peakTime = formatHour(topHour?.hour);
 
   // Project next recommended slot
   const nextSlot = findNextSlot(referenceDate, recommendedDayIndices, dayStats);
@@ -114,6 +139,8 @@ export function analyzePostingStrategy(
     bestDays: dayStats.filter((d) => d.isRecommended),
     recommendedCadence: "3 posts / week",
     peakTime,
+    peakTimePostCount: topHour?.postCount ?? 0,
+    peakTimeAvgViews: topHour?.avgViews ?? 0,
     topFormat: "Reel",
     nextRecommendedSlot: nextSlot,
   };
