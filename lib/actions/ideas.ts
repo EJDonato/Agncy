@@ -17,12 +17,16 @@ export async function deleteIdeaAction(ideaId: string) {
 }
 
 const IdeaIdSchema = z.string().min(1);
+const GenerateIdeasSchema = z.object({
+  prompt: z.string().trim().max(1_500, "Your direction must be 1,500 characters or fewer.").optional(),
+});
 
-export async function generateContentIdeasAction() {
+export async function generateContentIdeasAction(input?: { prompt?: string }) {
+  const { prompt } = GenerateIdeasSchema.parse(input ?? {});
   const profile = db.select().from(brandProfiles).limit(1).get();
   if (!profile) throw new Error("Set up your Brand Brain profile before generating content ideas.");
 
-  const generatedIdeas = await generateContentIdeas({ brandId: profile.id });
+  const generatedIdeas = await generateContentIdeas({ brandId: profile.id, prompt });
   db.transaction((tx) => {
     for (const idea of generatedIdeas) {
       tx.insert(ideas).values({

@@ -4,7 +4,11 @@ import { useState, useRef } from "react";
 import { UploadCloud, CheckCircle2, AlertCircle, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export function CsvDropzone() {
+interface CsvDropzoneProps {
+  onUploadSuccess?: () => void;
+}
+
+export function CsvDropzone({ onUploadSuccess }: CsvDropzoneProps = {}) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
@@ -34,6 +38,7 @@ export function CsvDropzone() {
       if (data.success) {
         setResult({ success: true, message: data.message });
         router.refresh();
+        onUploadSuccess?.();
       } else {
         setResult({ success: false, message: data.error || "Failed to import CSV." });
       }

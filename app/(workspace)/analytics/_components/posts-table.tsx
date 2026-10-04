@@ -5,22 +5,32 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import type { PostWithLatestMetrics } from "@/lib/db/queries/posts";
 import { PostCard } from "./post-card";
 
-type SortKey = "publishedAt" | "views" | "avgSecondsViewed" | "interactions";
-type ScriptOption = { id: string; title: string };
+type SortKey =
+  | "publishedAt"
+  | "views"
+  | "impressions"
+  | "interactions"
+  | "comments"
+  | "shares"
+  | "avgSecondsViewed"
+  | "totalSecondsViewed";
 
 interface Props {
   posts: PostWithLatestMetrics[];
-  scripts: ScriptOption[];
 }
 
 const SORT_OPTIONS: Array<{ value: SortKey; label: string }> = [
   { value: "publishedAt", label: "Newest first" },
-  { value: "views", label: "Most viewed" },
-  { value: "avgSecondsViewed", label: "Best watch time" },
+  { value: "views", label: "Most views" },
+  { value: "impressions", label: "Most impressions" },
   { value: "interactions", label: "Most interactions" },
+  { value: "comments", label: "Most comments" },
+  { value: "shares", label: "Most shares" },
+  { value: "avgSecondsViewed", label: "Best watch time" },
+  { value: "totalSecondsViewed", label: "Most total watch time" },
 ];
 
-export function PostsTable({ posts, scripts }: Props) {
+export function PostsTable({ posts }: Props) {
   const [filterType, setFilterType] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("publishedAt");
@@ -99,7 +109,7 @@ export function PostsTable({ posts, scripts }: Props) {
       ) : (
         <div className="space-y-3.5">
           {visiblePosts.map((post) => (
-            <PostCard key={post.id} post={post} scripts={scripts} />
+            <PostCard key={post.id} post={post} />
           ))}
         </div>
       )}

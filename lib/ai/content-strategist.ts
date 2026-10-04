@@ -7,6 +7,7 @@ import { brandProfiles, posts, scripts } from "@/lib/db/schema";
 
 interface GenerateIdeasParams {
   brandId: string;
+  prompt?: string;
 }
 
 function getPastContentContext(brandId: string): string {
@@ -35,7 +36,7 @@ function getPastContentContext(brandId: string): string {
   ].join("\n\n");
 }
 
-export async function generateContentIdeas({ brandId }: GenerateIdeasParams): Promise<ContentIdea[]> {
+export async function generateContentIdeas({ brandId, prompt: strategistBrief }: GenerateIdeasParams): Promise<ContentIdea[]> {
   const profile = db.select().from(brandProfiles).where(eq(brandProfiles.id, brandId)).get();
   if (!profile) throw new Error("Set up your Brand Brain profile before generating content ideas.");
 
@@ -47,6 +48,8 @@ Language: ${profile.languageMix}
 Guardrails: ${profile.dosAndDonts || "None supplied"}
 
 Generate 6 distinct, specific short-form content ideas. Learn from the past content below: extend proven themes or find useful gaps, but never repeat a prior title. Do not invent performance claims or current facts. Each hook must express a clear tension and be appropriate for the creator's voice. Set predictedFitScore as a decimal from 0 to 1 (for example, 0.88), never as a percentage.
+
+${strategistBrief ? `Creator direction: ${strategistBrief}\nPrioritize this direction where it fits the brand and guardrails. It is guidance, not a request to invent facts.` : "No additional creator direction was given; choose the strongest opportunities from the past content."}
 
 ${getPastContentContext(brandId)}
 

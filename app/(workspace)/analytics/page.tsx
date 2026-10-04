@@ -1,15 +1,14 @@
 import { getPostsWithLatestMetrics } from "@/lib/db/queries/posts";
-import { CsvDropzone } from "./_components/csv-dropzone";
+import { UploadCsvDialog } from "./_components/upload-csv-dialog";
 import { PostsTable } from "./_components/posts-table";
-import { getScriptsList } from "@/lib/db/queries/scripts";
 import { BarChart3, TrendingUp, Film, Eye, Sparkles } from "lucide-react";
 import { PersonaCard } from "@/components/persona-card";
+import { GeminiPerformanceAnalysis } from "./_components/gemini-performance-analysis";
 
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
   const posts = await getPostsWithLatestMetrics();
-  const scripts = getScriptsList();
 
   const totalViews = posts.reduce((acc, p) => acc + p.views, 0);
   const totalInteractions = posts.reduce((acc, p) => acc + p.interactions, 0);
@@ -29,9 +28,12 @@ export default async function AnalyticsPage() {
             Meta Business Suite lifetime snapshots normalized and indexed for the Brand Brain.
           </p>
         </div>
-        <div className="text-xs font-mono text-slate-600 bg-white border border-slate-200 px-3.5 py-1.5 rounded-xl self-start sm:self-center shadow-sm">
-          <span>Database: </span>
-          <span className="text-brand-emerald font-semibold">{posts.length} posts recorded</span>
+        <div className="flex flex-wrap items-center gap-3 self-start sm:self-center">
+          <div className="text-xs font-mono text-slate-600 bg-white border border-slate-200 px-3.5 py-1.5 rounded-xl shadow-sm">
+            <span>Database: </span>
+            <span className="text-brand-emerald font-semibold">{posts.length} posts recorded</span>
+          </div>
+          <UploadCsvDialog />
         </div>
       </div>
 
@@ -88,8 +90,7 @@ export default async function AnalyticsPage() {
         </div>
       </div>
 
-      {/* CSV Dropzone */}
-      <CsvDropzone />
+      <GeminiPerformanceAnalysis />
 
       {/* Posts Table */}
       <div className="space-y-4">
@@ -102,10 +103,7 @@ export default async function AnalyticsPage() {
             Showing latest lifetime snapshots
           </span>
         </div>
-        <PostsTable
-          posts={posts}
-          scripts={scripts.map(({ id, title }) => ({ id, title }))}
-        />
+        <PostsTable posts={posts} />
       </div>
     </div>
   );

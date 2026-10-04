@@ -15,13 +15,16 @@ export interface PostWithLatestMetrics {
   // Metrics from latest snapshot
   views: number;
   viewers: number;
+  impressions: number;
   interactions: number;
   reactions: number;
   comments: number;
   shares: number;
   saves: number;
   avgSecondsViewed: number;
+  totalSecondsViewed: number;
   distributionScore: string | null;
+  approximateEarningsUsd: number;
   snapshots: PostSnapshot[];
 }
 
@@ -47,13 +50,16 @@ export async function getPostsWithLatestMetrics(): Promise<PostWithLatestMetrics
       postId: postMetricSnapshots.postId,
       views: postMetricSnapshots.views,
       viewers: postMetricSnapshots.viewers,
+      impressions: postMetricSnapshots.impressions,
       interactions: postMetricSnapshots.interactions,
       reactions: postMetricSnapshots.reactions,
       comments: postMetricSnapshots.comments,
       shares: postMetricSnapshots.shares,
       saves: postMetricSnapshots.saves,
       avgSecondsViewed: postMetricSnapshots.avgSecondsViewed,
+      totalSecondsViewed: postMetricSnapshots.totalSecondsViewed,
       distributionScore: postMetricSnapshots.distributionScore,
+      approximateEarningsUsd: postMetricSnapshots.approximateEarningsUsd,
       capturedAt: postMetricSnapshots.capturedAt,
       fileName: importBatches.fileName,
     })
@@ -85,13 +91,16 @@ export async function getPostsWithLatestMetrics(): Promise<PostWithLatestMetrics
       durationSeconds: post.durationSeconds,
       views: latestSnapshot?.views ?? 0,
       viewers: latestSnapshot?.viewers ?? 0,
+      impressions: latestSnapshot?.impressions ?? 0,
       interactions: latestSnapshot?.interactions ?? 0,
       reactions: latestSnapshot?.reactions ?? 0,
       comments: latestSnapshot?.comments ?? 0,
       shares: latestSnapshot?.shares ?? 0,
       saves: latestSnapshot?.saves ?? 0,
       avgSecondsViewed: latestSnapshot?.avgSecondsViewed ?? 0,
+      totalSecondsViewed: latestSnapshot?.totalSecondsViewed ?? 0,
       distributionScore: latestSnapshot?.distributionScore ?? "--",
+      approximateEarningsUsd: latestSnapshot?.approximateEarningsUsd ?? 0,
       snapshots: snapshotRows.map((snapshot) => ({
         id: snapshot.id,
         views: snapshot.views ?? 0,

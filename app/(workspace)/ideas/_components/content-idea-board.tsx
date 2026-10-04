@@ -18,10 +18,11 @@ export function ContentIdeaBoard({ ideas }: { ideas: ContentIdeaListItem[] }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState("");
 
   async function generateIdeas() {
     setIsGenerating(true); setError(null);
-    try { await generateContentIdeasAction(); }
+    try { await generateContentIdeasAction({ prompt: prompt.trim() || undefined }); }
     catch (generationError) { setError(generationError instanceof Error ? generationError.message : "Could not generate content ideas."); }
     finally { setIsGenerating(false); }
   }
@@ -40,9 +41,10 @@ export function ContentIdeaBoard({ ideas }: { ideas: ContentIdeaListItem[] }) {
   }
 
   return <section className="space-y-4">
-    <div className="apple-glass-card flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6 rounded-2xl">
+    <div className="apple-glass-card flex flex-col gap-4 p-5 sm:p-6 rounded-2xl">
       <div><h2 className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900"><Sparkles className="w-4 h-4 text-[#1f54fc]" /> AI Content Ideas</h2><p className="mt-1 text-xs text-slate-500">Gemini learns from your previous posts and scripts, then proposes the next angles to pursue.</p></div>
-      <button type="button" onClick={() => void generateIdeas()} disabled={isGenerating} className="apple-btn-primary min-h-[44px] shrink-0 px-5 rounded-xl text-xs disabled:opacity-50 flex items-center justify-center gap-2">{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}{isGenerating ? "Generating..." : "Generate Ideas"}</button>
+      <label className="space-y-1.5"><span className="block text-[11px] font-mono font-medium tracking-wider text-slate-600">OPTIONAL CREATOR DIRECTION</span><textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} maxLength={1_500} rows={3} disabled={isGenerating} placeholder="e.g. I want to explore flood preparedness for barangays, with a practical and hopeful angle." className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-xs font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1f54fc] focus:ring-2 focus:ring-[#1f54fc]/20 disabled:opacity-50" /><span className="block text-[11px] text-slate-500">Leave blank to let the strategist find the best opportunities.</span></label>
+      <div className="flex justify-end"><button type="button" onClick={() => void generateIdeas()} disabled={isGenerating} className="apple-btn-primary min-h-[44px] shrink-0 px-5 rounded-xl text-xs disabled:opacity-50 flex items-center justify-center gap-2">{isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}{isGenerating ? "Generating..." : "Generate Ideas"}</button></div>
     </div>
     {error && <div role="alert" className="rounded-xl border border-brand-rose/30 bg-brand-rose/10 p-3 text-xs font-mono text-brand-rose">{error}</div>}
     {ideas.length === 0 ? <div className="apple-glass-card rounded-2xl p-10 text-center text-xs text-slate-500">Generate ideas to start your content pipeline.</div> : <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

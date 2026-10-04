@@ -41,6 +41,41 @@ export const ContentIdeasResponseSchema = z.object({
 
 export type ContentIdea = z.infer<typeof ContentIdeaSchema>;
 
+export const PerformanceAnalysisSchema = z.object({
+  executiveSummary: z.string().trim().min(10).max(800),
+  winningPatterns: z.array(z.object({
+    finding: z.string().trim().min(5).max(500),
+    evidence: z.string().trim().min(5).max(700),
+    recommendation: z.string().trim().min(5).max(500),
+  })).min(1).max(4),
+  experiments: z.array(z.string().trim().min(5).max(500)).min(1).max(3),
+  caveat: z.string().trim().min(5).max(500),
+});
+
+export type PerformanceAnalysis = z.infer<typeof PerformanceAnalysisSchema>;
+
+export const PerformanceAnalysisGeminiSchema: Schema = {
+  type: Type.OBJECT,
+  properties: {
+    executiveSummary: { type: Type.STRING },
+    winningPatterns: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          finding: { type: Type.STRING },
+          evidence: { type: Type.STRING },
+          recommendation: { type: Type.STRING },
+        },
+        required: ["finding", "evidence", "recommendation"],
+      },
+    },
+    experiments: { type: Type.ARRAY, items: { type: Type.STRING } },
+    caveat: { type: Type.STRING },
+  },
+  required: ["executiveSummary", "winningPatterns", "experiments", "caveat"],
+};
+
 export const ContentIdeasGeminiSchema: Schema = {
   type: Type.OBJECT,
   properties: {

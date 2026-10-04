@@ -28,7 +28,7 @@ export function PersonaCard({ persona, message, compact = false }: PersonaCardPr
       className={`fixed bottom-0 left-0 ${
         compact ? "z-[60]" : "z-50"
       } pointer-events-none select-none flex items-end`}
-      aria-label={`${profile.role} companion`}
+      aria-label={`${profile.name}, ${profile.role}`}
       aria-live="polite"
     >
       <div className="relative flex items-end pointer-events-none">
@@ -44,12 +44,12 @@ export function PersonaCard({ persona, message, compact = false }: PersonaCardPr
             <div className="flex items-center justify-between gap-2 mb-2">
               <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50/90 border border-blue-200 text-[10px] font-mono font-semibold uppercase tracking-wider text-[#1f54fc]">
                 <MessageCircle className="h-3 w-3 text-[#1f54fc]" />
-                <span>{profile.role}</span>
+                <span>{profile.name} · {profile.role}</span>
               </div>
               <button
                 type="button"
                 onClick={() => setBubbleVisible(false)}
-                aria-label={`Dismiss ${profile.role} message`}
+                aria-label={`Dismiss ${profile.name}'s message`}
                 className="apple-press flex h-6 w-6 items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]"
               >
                 <X className="h-3.5 w-3.5" />
@@ -69,7 +69,7 @@ export function PersonaCard({ persona, message, compact = false }: PersonaCardPr
         >
           <Image
             src={profile.image}
-            alt={`${profile.role} persona`}
+            alt={`${profile.name}, ${profile.role}`}
             width={1159}
             height={1500}
             unoptimized
