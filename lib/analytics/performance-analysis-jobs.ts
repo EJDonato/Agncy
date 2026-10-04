@@ -51,6 +51,9 @@ function failIfStale(row: JobRow): JobRow {
 }
 
 function userFacingError(error: unknown): string {
+  if (error instanceof z.ZodError) {
+    return "Gemini returned an unexpected analysis format. Please start the analysis again.";
+  }
   if (typeof error === "object" && error !== null && "status" in error) {
     const status = typeof error.status === "number" ? error.status : undefined;
     if (status === 429 || status === 503) {
