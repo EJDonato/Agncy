@@ -61,7 +61,7 @@ export function PostsTable({ posts }: Props) {
               role="tab"
               aria-selected={filterType === type}
               onClick={() => setFilterType(type)}
-              className={`apple-press min-h-11 px-4 rounded-xl text-xs font-mono font-medium shrink-0 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-amber ${
+              className={`apple-press min-h-11 px-4 rounded-xl text-xs font-mono font-medium shrink-0 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc] ${
                 filterType === type
                   ? "bg-blue-50 text-[#1f54fc] border border-blue-200/80 shadow-[inset_0_1px_0_0_rgba(31,84,252,0.15)] font-semibold"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent"
@@ -81,7 +81,7 @@ export function PostsTable({ posts }: Props) {
               placeholder="Search captions & hooks..."
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              className="w-full min-h-11 pl-10 pr-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 font-mono focus:outline-none focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 transition-all shadow-sm"
+              className="w-full min-h-11 pl-10 pr-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 font-mono focus:outline-none focus:border-[#1f54fc] focus:ring-2 focus:ring-[#1f54fc]/20 transition-all shadow-sm"
             />
           </label>
           <label className="relative sm:w-48">
@@ -90,7 +90,7 @@ export function PostsTable({ posts }: Props) {
             <select
               value={sortKey}
               onChange={(event) => setSortKey(event.target.value as SortKey)}
-              className="w-full min-h-11 pl-10 pr-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 font-mono focus:outline-none focus:border-brand-amber transition-all shadow-sm"
+              className="w-full min-h-11 pl-10 pr-3.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 font-mono focus:outline-none focus:border-[#1f54fc] focus:ring-2 focus:ring-[#1f54fc]/20 transition-all shadow-sm"
             >
               {SORT_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -103,13 +103,13 @@ export function PostsTable({ posts }: Props) {
       </div>
 
       {visiblePosts.length === 0 ? (
-        <div className="rounded-2xl apple-glass-card py-16 text-center text-sm text-slate-500 font-mono">
+        <div className="rounded-2xl apple-glass-card py-16 text-center text-sm text-slate-500 font-mono apple-item-enter">
           {posts.length === 0 ? "Import a Meta CSV to populate analytics." : "No matching posts."}
         </div>
       ) : (
         <div className="space-y-3.5">
-          {visiblePosts.map((post) => (
-            <PostCard key={post.id} post={post} />
+          {visiblePosts.map((post, index) => (
+            <PostCard key={post.id} post={post} index={index} />
           ))}
         </div>
       )}

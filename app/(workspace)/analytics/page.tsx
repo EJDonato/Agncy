@@ -41,7 +41,7 @@ export default async function AnalyticsPage() {
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="apple-glass-card p-5 rounded-2xl">
+        <div className="apple-glass-card apple-item-enter p-5 rounded-2xl" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono tracking-wider">
             <span>TOTAL POSTS</span>
             <Film className="w-4 h-4 text-slate-400" />
@@ -54,7 +54,7 @@ export default async function AnalyticsPage() {
           </p>
         </div>
 
-        <div className="apple-glass-card p-5 rounded-2xl">
+        <div className="apple-glass-card apple-item-enter p-5 rounded-2xl" style={{ animationDelay: "40ms" }}>
           <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono tracking-wider">
             <span>TOTAL VIEWS</span>
             <Eye className="w-4 h-4 text-brand-emerald" />
@@ -65,7 +65,7 @@ export default async function AnalyticsPage() {
           <p className="text-xs text-slate-500 mt-1">Cumulative lifetime impressions</p>
         </div>
 
-        <div className="apple-glass-card p-5 rounded-2xl">
+        <div className="apple-glass-card apple-item-enter p-5 rounded-2xl" style={{ animationDelay: "80ms" }}>
           <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono tracking-wider">
             <span>TOP REEL VIEWS</span>
             <TrendingUp className="w-4 h-4 text-[#1f54fc]" />
@@ -78,7 +78,7 @@ export default async function AnalyticsPage() {
           </p>
         </div>
 
-        <div className="apple-glass-card p-5 rounded-2xl">
+        <div className="apple-glass-card apple-item-enter p-5 rounded-2xl" style={{ animationDelay: "120ms" }}>
           <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono tracking-wider">
             <span>INTERACTIONS</span>
             <Sparkles className="w-4 h-4 text-slate-400" />

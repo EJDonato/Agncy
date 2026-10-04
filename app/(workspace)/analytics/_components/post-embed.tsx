@@ -1,3 +1,5 @@
+"use client";
+
 import { ExternalLink, ImageOff } from "lucide-react";
 import { getFacebookEmbedUrl } from "@/lib/analytics/facebook-embed";
 

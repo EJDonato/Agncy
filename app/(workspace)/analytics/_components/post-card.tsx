@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Bookmark,
   Clock,
@@ -16,11 +18,15 @@ import {
 import type { PostWithLatestMetrics } from "@/lib/db/queries/posts";
 import { PostEmbed } from "./post-embed";
 
-export function PostCard({ post }: { post: PostWithLatestMetrics }) {
+export function PostCard({ post, index = 0 }: { post: PostWithLatestMetrics; index?: number }) {
   const title = post.normalizedTitle || post.rawTitle || "Untitled Post";
+  const staggerDelay = `${Math.min(index * 35, 140)}ms`;
 
   return (
-    <article className="apple-glass-card flex flex-col gap-4 overflow-hidden rounded-2xl p-4 sm:p-5 lg:flex-row transition-all shadow-apple-card">
+    <article
+      style={{ animationDelay: staggerDelay }}
+      className="apple-glass-card apple-item-enter flex flex-col gap-4 overflow-hidden rounded-2xl p-4 sm:p-5 lg:flex-row transition-all shadow-apple-card"
+    >
       <div className="shrink-0 self-center lg:self-start">
         <PostEmbed permalink={post.permalink} postType={post.postType} title={title} />
       </div>
@@ -109,7 +115,7 @@ function Metric({
   accent?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 px-3 py-2">
+    <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-white hover:border-slate-300 hover:shadow-sm px-3 py-2 transition-all duration-150">
       <div className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-wider text-slate-500">
         <Icon className="w-3 h-3 text-slate-400" />
         <span className="truncate">{label}</span>
