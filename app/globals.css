@@ -31,12 +31,18 @@ input, textarea {
 }
 
 /* Apple-style Fluid Interaction Utilities */
+:root {
+  --ease-apple-spring: cubic-bezier(0.16, 1, 0.3, 1); /* Decelerating exponential spring */
+  --ease-apple-press: cubic-bezier(0.2, 0.9, 0.3, 1);  /* Instant physical feedback */
+  --ease-apple-exit: cubic-bezier(0.25, 1, 0.5, 1);   /* Snappy exit */
+}
+
 .apple-press {
-  transition: transform 120ms cubic-bezier(0.25, 1, 0.5, 1), filter 120ms ease-out, background-color 150ms ease-out;
+  transition: transform 90ms var(--ease-apple-press), filter 100ms ease-out, background-color 140ms ease-out;
 }
 .apple-press:active {
-  transform: scale(0.975);
-  filter: brightness(0.96);
+  transform: scale(0.965);
+  filter: brightness(0.95);
 }
 
 .apple-glass {
@@ -49,12 +55,17 @@ input, textarea {
   background-color: #FFFFFF;
   border: 1px solid #E2E8F0;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 4px 14px -2px rgba(0, 0, 0, 0.04);
-  transition: transform 140ms cubic-bezier(0.25, 1, 0.5, 1), box-shadow 140ms ease, border-color 140ms ease;
+  transition: transform 140ms var(--ease-apple-spring), box-shadow 140ms ease, border-color 140ms ease;
 }
 
 .apple-glass-card:hover {
+  transform: translateY(-2px);
   border-color: #CBD5E1;
-  box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.07), 0 2px 6px 0 rgba(0, 0, 0, 0.03);
+  box-shadow: 0 8px 24px -2px rgba(0, 0, 0, 0.07), 0 2px 6px 0 rgba(0, 0, 0, 0.03);
+}
+
+.apple-glass-card:active {
+  transform: translateY(0) scale(0.985);
 }
 
 /* Apple Pro button style (Blue to Purple accent gradient) */
@@ -63,22 +74,133 @@ input, textarea {
   color: #FFFFFF;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(31, 84, 252, 0.28), inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
-  transition: transform 120ms cubic-bezier(0.25, 1, 0.5, 1), filter 120ms ease-out, box-shadow 150ms ease-out;
+  transition: transform 90ms var(--ease-apple-press), filter 100ms ease-out, box-shadow 140ms ease-out;
 }
 .apple-btn-primary:hover {
   filter: brightness(1.06);
   box-shadow: 0 4px 14px rgba(71, 38, 246, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
 }
 .apple-btn-primary:active {
-  transform: scale(0.97);
-  filter: brightness(0.95);
+  transform: scale(0.965);
+  filter: brightness(0.94);
   box-shadow: 0 1px 3px rgba(31, 84, 252, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Apple Fluid Motion Physics (WWDC 2018/2026 Directives) */
-:root {
-  --ease-apple-enter: cubic-bezier(0.16, 1, 0.3, 1); /* Exponential deceleration, zero bounce */
-  --ease-apple-exit: cubic-bezier(0.25, 1, 0.5, 1);
+/* Page Transition Entrance */
+@keyframes apple-page-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.apple-page-enter {
+  animation: apple-page-enter 240ms var(--ease-apple-spring) both;
+}
+
+/* Top Navigation Progress Bar */
+@keyframes apple-nav-load {
+  0% {
+    width: 0%;
+  }
+  30% {
+    width: 45%;
+  }
+  70% {
+    width: 80%;
+  }
+  100% {
+    width: 95%;
+  }
+}
+
+.apple-nav-progress {
+  animation: apple-nav-load 1.6s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+/* Persona Character Rise & Idle Breathing */
+@keyframes persona-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(32px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes persona-idle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.persona-rise {
+  animation: persona-rise 420ms var(--ease-apple-spring) both;
+}
+
+.persona-idle {
+  animation: persona-idle 5s ease-in-out infinite;
+}
+
+/* Persona Speech Bubble Pop */
+@keyframes bubble-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(14px);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1.015) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes bubble-pop-out {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(8px);
+  }
+}
+
+@keyframes bubble-text-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bubble-pop-in {
+  transform-origin: bottom left;
+  animation: bubble-pop-in 340ms var(--ease-apple-spring) both;
+}
+
+.bubble-pop-out {
+  transform-origin: bottom left;
+  animation: bubble-pop-out 160ms var(--ease-apple-exit) forwards;
+}
+
+.bubble-text-fade {
+  animation: bubble-text-fade 200ms ease-out both;
 }
 
 @keyframes apple-backdrop-enter {
@@ -110,7 +232,7 @@ input, textarea {
 @keyframes apple-modal-enter {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(8px);
+    transform: scale(0.94) translateY(10px);
   }
   to {
     opacity: 1;
@@ -125,7 +247,7 @@ input, textarea {
   }
   to {
     opacity: 0;
-    transform: scale(0.97) translateY(4px);
+    transform: scale(0.96) translateY(6px);
   }
 }
 
@@ -150,7 +272,7 @@ input, textarea {
 }
 
 .apple-backdrop-in {
-  animation: apple-backdrop-enter 240ms var(--ease-apple-enter) forwards;
+  animation: apple-backdrop-enter 240ms var(--ease-apple-spring) forwards;
 }
 
 .apple-backdrop-out {
@@ -158,7 +280,7 @@ input, textarea {
 }
 
 .apple-modal-in {
-  animation: apple-modal-enter 300ms var(--ease-apple-enter) forwards;
+  animation: apple-modal-enter 300ms var(--ease-apple-spring) forwards;
 }
 
 .apple-modal-out {
@@ -166,30 +288,11 @@ input, textarea {
 }
 
 .apple-item-enter {
-  animation: apple-item-enter 300ms var(--ease-apple-enter) both;
+  animation: apple-item-enter 300ms var(--ease-apple-spring) both;
 }
 
 .apple-btn-generating {
   animation: apple-glow-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Custom Scrollbars for High-Density Studio View */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
 }
 
 /* Accessibility: Reduced motion & Reduced transparency */
@@ -207,6 +310,13 @@ input, textarea {
   .apple-backdrop-in,
   .apple-backdrop-out,
   .apple-item-enter,
+  .apple-page-enter,
+  .apple-nav-progress,
+  .persona-rise,
+  .persona-idle,
+  .bubble-pop-in,
+  .bubble-pop-out,
+  .bubble-text-fade,
   .apple-btn-generating {
     animation: none !important;
     transform: none !important;

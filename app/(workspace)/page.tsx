@@ -54,7 +54,7 @@ export default async function DashboardPage() {
 
       {/* KPI Metric Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="apple-glass-card p-5 rounded-2xl">
+        <div className="apple-glass-card apple-item-enter p-5 rounded-2xl" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center justify-between text-[11px] text-slate-700 font-mono tracking-wider font-semibold">
             <span>WRITING REFERENCES</span>
             <Sparkles className="w-4 h-4 text-emerald-600" />
@@ -70,7 +70,7 @@ export default async function DashboardPage() {
           <p className="text-xs text-slate-600 mt-2">Up to 3 recent finals guide structure and wording</p>
         </div>
 
-        <div className="apple-glass-card p-5 rounded-2xl">
+        <div className="apple-glass-card apple-item-enter p-5 rounded-2xl" style={{ animationDelay: "50ms" }}>
           <div className="flex items-center justify-between text-[11px] text-slate-700 font-mono tracking-wider font-semibold">
             <span>AVG REEL RETENTION</span>
             <TrendingUp className="w-4 h-4 text-[#1f54fc]" />
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
           <p className="text-xs text-slate-600 mt-2">Calculated from imported Meta Reels</p>
         </div>
 
-        <div className="apple-glass-card p-5 rounded-2xl">
+        <div className="apple-glass-card apple-item-enter p-5 rounded-2xl" style={{ animationDelay: "100ms" }}>
           <div className="flex items-center justify-between text-[11px] text-slate-700 font-mono tracking-wider font-semibold">
             <span>ACTIVE STYLE RULES</span>
             <ShieldCheck className="w-4 h-4 text-[#4726f6]" />
@@ -102,7 +102,7 @@ export default async function DashboardPage() {
           <p className="text-xs text-slate-600 mt-2">Calibrated from brand voice directives</p>
         </div>
 
-        <div className="apple-glass-card p-5 rounded-2xl">
+        <div className="apple-glass-card apple-item-enter p-5 rounded-2xl" style={{ animationDelay: "150ms" }}>
           <div className="flex items-center justify-between text-[11px] text-slate-700 font-mono tracking-wider font-semibold">
             <span>POSTS RECORDED</span>
             <FileEdit className="w-4 h-4 text-emerald-600" />

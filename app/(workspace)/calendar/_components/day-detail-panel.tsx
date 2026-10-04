@@ -30,6 +30,16 @@ export function DayDetailPanel({
 }: DayDetailPanelProps) {
   const router = useRouter();
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    if (isClosing) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 180);
+  };
 
   if (!isOpen || !dateStr) return null;
 
@@ -64,14 +74,18 @@ export function DayDetailPanel({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 md:left-64 apple-backdrop-in"
-      onClick={onClose}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 md:left-64 ${
+        isClosing ? "apple-backdrop-out" : "apple-backdrop-in"
+      }`}
+      onClick={handleClose}
     >
       <div
         role="dialog"
         aria-modal="true"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-2xl p-6 sm:p-7 shadow-[0_24px_64px_rgba(0,0,0,0.12)] space-y-5 apple-modal-in"
+        className={`w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-2xl p-6 sm:p-7 shadow-[0_24px_64px_rgba(0,0,0,0.12)] space-y-5 ${
+          isClosing ? "apple-modal-out" : "apple-modal-in"
+        }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-200 pb-3.5">
@@ -89,7 +103,7 @@ export function DayDetailPanel({
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close detail panel"
             className="apple-press min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
           >

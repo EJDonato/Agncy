@@ -58,6 +58,9 @@ export function Sidebar() {
               >
                 <Icon className={cn("w-4 h-4 transition-colors", isActive ? "text-[#1f54fc]" : "text-slate-400")} />
                 <span>{item.label}</span>
+                {isActive && (
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#1f54fc] shadow-[0_0_8px_rgba(31,84,252,0.9)] animate-in fade-in zoom-in-75 duration-200" />
+                )}
               </Link>
             );
           })}
