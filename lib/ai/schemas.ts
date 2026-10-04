@@ -26,6 +26,41 @@ export const ScriptDraftSchema = z.object({
 
 export type ScriptDraft = z.infer<typeof ScriptDraftSchema>;
 
+export const ContentIdeaSchema = z.object({
+  topic: z.string().trim().min(3).max(500),
+  angleHook: z.string().trim().min(3).max(500),
+  whySuggested: z.string().trim().min(3).max(1_000),
+  // Gemini sometimes returns a human-readable percentage (e.g. 88) instead
+  // of a decimal (0.88). Normalize both formats at this external boundary.
+  predictedFitScore: z.number().min(0).max(100).transform((score) => score > 1 ? score / 100 : score),
+});
+
+export const ContentIdeasResponseSchema = z.object({
+  ideas: z.array(ContentIdeaSchema).min(1).max(8),
+});
+
+export type ContentIdea = z.infer<typeof ContentIdeaSchema>;
+
+export const ContentIdeasGeminiSchema: Schema = {
+  type: Type.OBJECT,
+  properties: {
+    ideas: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          topic: { type: Type.STRING },
+          angleHook: { type: Type.STRING },
+          whySuggested: { type: Type.STRING },
+          predictedFitScore: { type: Type.NUMBER, description: "Fit score from 0 to 1, where 1 is the best fit." },
+        },
+        required: ["topic", "angleHook", "whySuggested", "predictedFitScore"],
+      },
+    },
+  },
+  required: ["ideas"],
+};
+
 export const ScriptDraftResponseSchema: Schema = {
   type: Type.OBJECT,
   properties: {

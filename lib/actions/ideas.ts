@@ -6,58 +6,48 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import crypto from "node:crypto";
 import { z } from "zod";
-
-const CreateIdeaSchema = z.object({
-  topic: z.string().trim().min(3, "Topic must be at least 3 characters").max(500),
-  angleHook: z.string().trim().min(3, "Hook angle is required").max(500),
-  whySuggested: z.string().trim().max(1000).default("Creator topic seed"),
-});
-
-export async function createIdeaAction(formData: FormData) {
-  const parsed = CreateIdeaSchema.parse({
-    topic: formData.get("topic"),
-    angleHook: formData.get("angleHook"),
-    whySuggested: formData.get("whySuggested") || "Creator topic seed",
-  });
-
-  let profile = db.select().from(brandProfiles).limit(1).get();
-  if (!profile) {
-    const profileId = `bp_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`;
-    db.insert(brandProfiles)
-      .values({
-        id: profileId,
-        creatorName: "Elton",
-        niche: "Civic tech, grassroots community apps, public interest technology",
-        targetAudience: "Filipino youth developers, civic organizers, local community builders",
-        toneOfVoice: "Direct, grounded, empathetic, analytical. No cringe hype or generic buzzwords.",
-        languageMix: "Taglish (Filipino/English)",
-        dosAndDonts: "Never start with 'Hey guys'. Start directly at the paradox or friction.",
-      })
-      .run();
-    profile = db.select().from(brandProfiles).limit(1).get();
-  }
-
-  const id = `idea_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`;
-  db.insert(ideas)
-    .values({
-      id,
-      brandId: profile!.id,
-      topic: parsed.topic,
-      angleHook: parsed.angleHook,
-      whySuggested: parsed.whySuggested,
-      status: "saved",
-      predictedFitScore: 0.9,
-    })
-    .run();
-
-  revalidatePath("/ideas");
-  revalidatePath("/");
-  return { success: true, ideaId: id };
-}
+import { generateContentIdeas } from "@/lib/ai/content-strategist";
 
 export async function deleteIdeaAction(ideaId: string) {
-  db.delete(ideas).where(eq(ideas.id, ideaId)).run();
+  const parsedIdeaId = z.string().min(1).parse(ideaId);
+  db.delete(ideas).where(eq(ideas.id, parsedIdeaId)).run();
   revalidatePath("/ideas");
   revalidatePath("/");
+  return { success: true };
+}
+
+const IdeaIdSchema = z.string().min(1);
+
+export async function generateContentIdeasAction() {
+  const profile = db.select().from(brandProfiles).limit(1).get();
+  if (!profile) throw new Error("Set up your Brand Brain profile before generating content ideas.");
+
+  const generatedIdeas = await generateContentIdeas({ brandId: profile.id });
+  db.transaction((tx) => {
+    for (const idea of generatedIdeas) {
+      tx.insert(ideas).values({
+        id: `idea_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`,
+        brandId: profile.id,
+        topic: idea.topic,
+        angleHook: idea.angleHook,
+        whySuggested: idea.whySuggested,
+        predictedFitScore: idea.predictedFitScore,
+        status: "suggested",
+      }).run();
+    }
+  });
+  revalidatePath("/ideas");
+  return { success: true, count: generatedIdeas.length };
+}
+
+export async function finalizeIdeaAction(ideaId: string) {
+  const parsedIdeaId = IdeaIdSchema.parse(ideaId);
+  const idea = db.select().from(ideas).where(eq(ideas.id, parsedIdeaId)).get();
+  if (!idea) throw new Error("Content idea not found.");
+  if (idea.status === "converted") throw new Error("This content idea already has a script.");
+
+  db.update(ideas).set({ status: "saved" }).where(eq(ideas.id, parsedIdeaId)).run();
+  revalidatePath("/ideas");
+  revalidatePath("/scripts");
   return { success: true };
 }

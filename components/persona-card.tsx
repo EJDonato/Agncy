@@ -29,6 +29,7 @@ export function PersonaCard({ persona, message, compact = false }: PersonaCardPr
         compact ? "z-[60]" : "z-50"
       } pointer-events-none select-none flex items-end`}
       aria-label={`${profile.role} companion`}
+      aria-live="polite"
     >
       <div className="relative flex items-end pointer-events-none">
         {/* 1. Text Bubble on the RIGHT: Sits underneath at z-10 so it never cuts the persona */}

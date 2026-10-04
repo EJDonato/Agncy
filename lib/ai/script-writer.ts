@@ -8,6 +8,7 @@ import crypto from "node:crypto";
 import { GEMINI_SCRIPT_MODELS } from "./models";
 
 export interface GenerateScriptParams {
+  ideaId: string;
   topic: string;
   format?: string;
   targetDurationSec?: number;
@@ -101,6 +102,7 @@ ${fewShotContext ? `Use these recent finalized scripts only as writing-style ref
     tx.insert(scripts).values({
       id: scriptId,
       brandId: profile.id,
+      ideaId: params.ideaId,
       title: validatedDraft.title,
       format,
       targetDurationSec,

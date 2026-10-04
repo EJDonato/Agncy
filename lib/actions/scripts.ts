@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { scripts, scriptVersions } from "@/lib/db/schema";
+import { ideas, scripts, scriptVersions } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { generateScriptDraft } from "@/lib/ai/script-writer";
 import { reviseScript } from "@/lib/ai/script-reviser";
@@ -10,28 +10,52 @@ import crypto from "node:crypto";
 import { z } from "zod";
 
 const CreateDraftSchema = z.object({
-  topic: z.string().trim().min(3, "Topic must be at least 3 characters").max(1_000, "Topic cannot exceed 1,000 characters"),
+  ideaId: z.string().min(1),
   format: z.string().default("Reel"),
   targetDurationSec: z.coerce.number().min(15).max(180).default(45),
 });
 
 export async function createScriptDraftAction(formData: FormData) {
   const parsed = CreateDraftSchema.parse({
-    topic: formData.get("topic"),
+    ideaId: formData.get("ideaId"),
     format: formData.get("format") || "Reel",
     targetDurationSec: formData.get("targetDurationSec") || 45,
   });
 
+  const idea = db.select().from(ideas).where(eq(ideas.id, parsed.ideaId)).get();
+  if (!idea || idea.status !== "saved") {
+    throw new Error("Choose a finalized content idea before drafting a script.");
+  }
+
   const result = await generateScriptDraft({
-    topic: parsed.topic,
+    ideaId: idea.id,
+    topic: `${idea.topic}\n\nApproved strategic angle: ${idea.angleHook}`,
     format: parsed.format,
     targetDurationSec: parsed.targetDurationSec,
   });
+  db.update(ideas).set({ status: "converted" }).where(eq(ideas.id, idea.id)).run();
 
   revalidatePath("/scripts");
   revalidatePath("/");
 
   return { success: true, scriptId: result.scriptId };
+}
+
+export async function deleteScriptAction(scriptId: string) {
+  const parsedScriptId = z.string().min(1).parse(scriptId);
+  const script = db.select().from(scripts).where(eq(scripts.id, parsedScriptId)).get();
+  if (!script) throw new Error("Script not found.");
+
+  db.transaction((tx) => {
+    tx.delete(scripts).where(eq(scripts.id, parsedScriptId)).run();
+    if (script.ideaId) {
+      tx.update(ideas).set({ status: "saved" }).where(eq(ideas.id, script.ideaId)).run();
+    }
+  });
+  revalidatePath("/scripts");
+  revalidatePath("/ideas");
+  revalidatePath("/");
+  return { success: true };
 }
 
 const ReviseScriptSchema = z.object({
