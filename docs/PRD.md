@@ -11,7 +11,7 @@
 
 **Agncy** is a local-first personal content agency workspace for one creator. It organizes the work of a small in-house agency around seven roles: Creative Director, Brand Strategist, Script Writer, Content Strategist, Video Editor, Performance Analyst, and Content Planner.
 
-The product's core bet is now simpler and clearer than the original proof of concept: write directly with a Script Writer that uses the creator's latest finalized scripts as style references, accepts natural-language revision prompts, and improves its future drafts from the creator's finished work. The creator sees one working script at a time—not parallel AI and edited views or a draft-survival comparison.
+The product's core bet is now simpler and clearer than the original proof of concept: write directly with Sera, a conversational Script Writer that uses the creator's latest finalized scripts as style references, discusses the current draft, applies explicit natural-language revision requests, and improves future drafts from the creator's finished work. The creator sees one working script at a time—not parallel AI and edited views or a draft-survival comparison.
 
 The app remains single-user, single-brand, and local-first. SQLite holds persistent working data; Gemini is used only for the AI writing operations.
 
@@ -19,7 +19,7 @@ The app remains single-user, single-brand, and local-first. SQLite holds persist
 
 - **Removed from the active script experience:** draft-survival percentages, side-by-side AI-versus-user comparison, and a visible diff workflow.
 - **Adopted:** up to three recent finalized scripts are used as few-shot writing references for the next draft.
-- **Adopted:** each script has a prompt-to-revise interaction. Revisions are saved as versions, but there is not yet a separate persistent chat/session transcript per script.
+- **Adopted:** each script has a persistent conversation with Sera. Discussion does not change the draft; explicit editing requests update the page and are saved as script versions.
 - **Adopted:** the workspace is presented as a role-based agency cockpit with persona art and short in-context role responses.
 - **Changed:** Analytics is a visual, searchable post library with compact Facebook previews rather than a dense table.
 - **Clarified:** Ideation, media processing, and calendar scheduling are still early surfaces; they are not yet autonomous research, caption-rendering, or date-based scheduling systems.
@@ -50,7 +50,7 @@ Agncy should make the next script start closer to the creator's real writing sty
 |---|---|
 | Direct publishing or social scheduling APIs | Content is uploaded manually; platform integrations are not needed to validate the writing loop. |
 | Accounts, billing, teams, or multi-brand support | The product is a personal workspace for one creator. |
-| Persistent AI chat transcripts per script | Versions and revisions are saved, but a separate conversational memory layer is not yet needed. |
+| Shared cross-persona or global chat memory | Sera's conversation is intentionally scoped to one script; other personas remain separate until their conversational surfaces are designed. |
 | Automatic fine-tuning of a custom model | Style adaptation uses recent finalized scripts and reviewable style rules. |
 | Autonomous trend/competitor research | The current Idea Hub is a manual and curated seed backlog. |
 | Full video timeline editing | Media is currently a configuration surface, not a timeline editor. |
@@ -70,7 +70,7 @@ One creator operating one personal brand, primarily making short-form Filipino/E
 |---|---|---|
 | Creative Director (`/`) | Dashboard with writing-reference, performance, rules, and post summaries plus a quick route into script creation | Shipped |
 | Brand Strategist (`/brand`) | Persistent creator profile and manually managed, reviewable style rules | Shipped |
-| Script Writer (`/scripts`, `/scripts/[id]`) | Gemini draft creation, one editable script, direct revision prompts, version history, finalization, and three recent finalized scripts as style examples | Shipped |
+| Script Writer (`/scripts`, `/scripts/[id]`) | Gemini draft creation, one editable script, a persistent script-scoped conversation with Sera, versioned revisions, finalization, and three recent finalized scripts as style examples | Shipped |
 | Content Strategist (`/ideas`) | Curated and manually saved topic seeds that can open the Script Writer with a topic | Shipped, intentionally lightweight |
 | Video Editor (`/studio`) | Local file selection and caption-style configuration interface | UI shell only |
 | Performance Analyst (`/analytics`) | Meta CSV import, deduplication, snapshots, searchable visual post library, Facebook previews, and manual script linking | Shipped |
@@ -107,18 +107,20 @@ One creator operating one personal brand, primarily making short-form Filipino/E
 |---|---|---|
 | S1 | Generate a short-form script from a topic, profile, active rules, and up to three recent finalized scripts | Shipped |
 | S2 | Persist an initial AI draft and render it in one editable, readable script surface | Shipped |
-| S3 | Prompt-revise the current script in natural language without collapsing its hook/body/visual-cue/CTA structure | Shipped |
+| S3 | Discuss or revise the current script with Sera in natural language without collapsing its hook/body/visual-cue/CTA structure | Shipped |
 | S4 | Save revisions as versions and save a finalized version | Shipped |
 | S5 | Use finalized scripts as future style examples, emphasizing structure, rhythm, transitions, vocabulary, and language mix | Shipped |
 | S6 | Support Reel, Short, and TikTok format choices with duration targets | Shipped |
 | S7 | Generate or revise one named section independently | Planned |
-| S8 | Keep a separate, persistent conversational session/transcript for each script | Future |
+| S8 | Keep a separate, persistent conversational session/transcript for each script | Shipped |
 | S9 | Link a finalized script to a published post | Shipped manually through Analytics |
 
 **Acceptance criteria:**
 
 - Given a saved Brand Strategist profile and at least one finalized script, a new draft uses the current profile, active rules, and up to three recent final scripts as writing references.
 - Given a revision prompt, the returned script remains structured with a hook, body beats, visual cues, pacing, and CTA rather than becoming one paragraph.
+- Given a question, critique request, or request for options, Sera replies in the script conversation without changing the draft.
+- Given an explicit request to apply an edit, Sera updates the editor and persists the result as a new script version.
 - Given a saved final script, it becomes eligible as a writing reference for later drafts.
 
 **Model policy:** Initial drafting tries Gemini 3.1 Pro Preview first, with configured Flash fallbacks. Revision prioritizes Gemini 3.5 Flash and falls back across configured Flash models. Revision calls use a 90-second timeout and return a user-facing busy/error state.

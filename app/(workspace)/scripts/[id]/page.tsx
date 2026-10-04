@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getScriptWithVersions } from "@/lib/db/queries/scripts";
+import { getSeraChatTurns } from "@/lib/db/queries/sera-chat";
 import { SingleScriptEditor } from "./_components/single-script-editor";
 
 interface ScriptPageProps {
@@ -13,6 +14,7 @@ export default async function ScriptDetailPage({ params }: ScriptPageProps) {
   if (!data) {
     notFound();
   }
+  const chatTurns = getSeraChatTurns(id);
 
   return (
     <SingleScriptEditor
@@ -25,6 +27,7 @@ export default async function ScriptDetailPage({ params }: ScriptPageProps) {
       }}
       baselineText={data.latestAiVersion?.fullContent || ""}
       initialContent={data.latestEditable?.fullContent || ""}
+      initialChatTurns={chatTurns}
     />
   );
 }
