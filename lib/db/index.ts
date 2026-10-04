@@ -34,6 +34,20 @@ sqlite.exec(`
   );
   CREATE INDEX IF NOT EXISTS performance_analysis_jobs_created_at_idx
     ON performance_analysis_jobs (created_at DESC);
+  CREATE TABLE IF NOT EXISTS sera_chat_turns (
+    id TEXT PRIMARY KEY NOT NULL,
+    script_id TEXT NOT NULL REFERENCES scripts(id) ON DELETE CASCADE,
+    user_message TEXT NOT NULL,
+    assistant_message TEXT,
+    action TEXT CHECK (action IN ('discuss', 'revise')),
+    status TEXT NOT NULL DEFAULT 'running' CHECK (status IN ('running', 'completed', 'failed')),
+    revision_version_id TEXT REFERENCES script_versions(id) ON DELETE SET NULL,
+    error_message TEXT,
+    created_at TEXT NOT NULL,
+    completed_at TEXT
+  );
+  CREATE INDEX IF NOT EXISTS sera_chat_turns_script_created_idx
+    ON sera_chat_turns (script_id, created_at);
 `);
 
 export const db = drizzle(sqlite, { schema });
