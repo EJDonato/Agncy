@@ -131,3 +131,15 @@ export const mediaAssets = sqliteTable("media_assets", {
   srtPath: text("srt_path"),
   processedAt: text("processed_at").default(sql`(CURRENT_TIMESTAMP)`),
 });
+
+export const contentSchedules = sqliteTable("content_schedules", {
+  id: text("id").primaryKey(),
+  scriptId: text("script_id").references(() => scripts.id, { onDelete: "set null" }),
+  title: text("title").notNull(),
+  scheduledDate: text("scheduled_date").notNull(), // ISO YYYY-MM-DD
+  scheduledTime: text("scheduled_time").default("19:00"),
+  format: text("format").default("Reel"),
+  status: text("status", { enum: ["planned", "filmed", "published"] }).notNull().default("planned"),
+  notes: text("notes"),
+  createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+});

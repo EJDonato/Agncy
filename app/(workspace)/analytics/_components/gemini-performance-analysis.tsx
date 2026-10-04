@@ -9,12 +9,13 @@ export function GeminiPerformanceAnalysis() {
   const [analysis, setAnalysis] = useState<PerformanceAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentConstraints, setCurrentConstraints] = useState("");
 
   async function runAnalysis() {
     setIsAnalyzing(true);
     setError(null);
     try {
-      setAnalysis(await generatePerformanceAnalysisAction());
+      setAnalysis(await generatePerformanceAnalysisAction({ currentConstraints: currentConstraints.trim() || undefined }));
     } catch (analysisError) {
       setError(analysisError instanceof Error ? analysisError.message : "Gemini could not analyze performance right now.");
     } finally {
@@ -46,6 +47,20 @@ export function GeminiPerformanceAnalysis() {
           <span>{isAnalyzing ? "Analyzing..." : "Analyze"}</span>
         </button>
       </div>
+
+      <label className="mt-5 block">
+        <span className="mb-1.5 block text-[10px] font-mono font-semibold tracking-wider text-slate-600">CURRENT CONTEXT &amp; CONSTRAINTS</span>
+        <textarea
+          value={currentConstraints}
+          onChange={(event) => { setCurrentConstraints(event.target.value); setAnalysis(null); }}
+          maxLength={1_500}
+          rows={3}
+          disabled={isAnalyzing}
+          placeholder="e.g. The financial-assistance application period has ended. Focus on evergreen civic-tech topics and currently active opportunities."
+          className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-xs font-mono leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-[#1f54fc] focus:outline-none focus:ring-2 focus:ring-[#1f54fc]/20 disabled:opacity-50"
+        />
+        <span className="mt-1.5 block text-[11px] text-slate-500">Optional. Add expired programs, current priorities, or topics you cannot act on.</span>
+      </label>
 
       {error && (
         <div role="alert" className="mt-4 rounded-xl border border-brand-rose/30 bg-brand-rose/10 p-3 text-xs font-mono text-brand-rose apple-item-enter">
