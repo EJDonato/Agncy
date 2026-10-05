@@ -73,6 +73,21 @@ export const axiomChatTurns = sqliteTable("axiom_chat_turns", {
   index("axiom_chat_turns_brand_created_idx").on(table.brandId, table.createdAt),
 ]);
 
+export const velaChatTurns = sqliteTable("vela_chat_turns", {
+  id: text("id").primaryKey(),
+  brandId: text("brand_id").notNull().references(() => brandProfiles.id, { onDelete: "cascade" }),
+  userMessage: text("user_message").notNull(),
+  assistantMessage: text("assistant_message"),
+  action: text("action", { enum: ["discuss", "generate"] }),
+  generatedIdeaCount: integer("generated_idea_count").notNull().default(0),
+  status: text("status", { enum: ["running", "completed", "failed"] }).notNull().default("running"),
+  errorMessage: text("error_message"),
+  createdAt: text("created_at").notNull(),
+  completedAt: text("completed_at"),
+}, (table) => [
+  index("vela_chat_turns_brand_created_idx").on(table.brandId, table.createdAt),
+]);
+
 export const scripts = sqliteTable("scripts", {
   id: text("id").primaryKey(),
   brandId: text("brand_id").notNull().references(() => brandProfiles.id),

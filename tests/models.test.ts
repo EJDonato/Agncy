@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ANTIGRAVITY_AGENT, GEMINI_AXIOM_CHAT_MODELS, GEMINI_CHAT_MODELS, GEMINI_REVISION_MODELS } from "../lib/ai/models";
+import { ANTIGRAVITY_AGENT, GEMINI_AXIOM_CHAT_MODELS, GEMINI_CHAT_MODELS, GEMINI_IDEA_MODELS, GEMINI_REVISION_MODELS } from "../lib/ai/models";
 
 test("uses Gemma 4 31B as the final revision fallback", () => {
   assert.equal(GEMINI_REVISION_MODELS.at(-1), "gemma-4-31b-it");
@@ -22,5 +22,6 @@ test("uses every configured text quota bucket for chat fallbacks", () => {
     "gemma-4-31b-it",
   ]);
   assert.equal(GEMINI_REVISION_MODELS, GEMINI_CHAT_MODELS);
+  assert.equal(GEMINI_IDEA_MODELS, GEMINI_CHAT_MODELS);
   assert.equal(ANTIGRAVITY_AGENT, "antigravity-preview-09-2026");
 });

@@ -1,6 +1,8 @@
 import { getIdeasList } from "@/lib/db/queries/ideas";
-import { PersonaCard } from "@/components/persona-card";
 import { ContentIdeaBoard, type ContentIdeaListItem } from "./_components/content-idea-board";
+import { VelaAssistant } from "./_components/vela-assistant";
+
+export const dynamic = "force-dynamic";
 
 export default async function IdeasPage() {
   const ideas: ContentIdeaListItem[] = getIdeasList().map((idea) => ({
@@ -19,7 +21,7 @@ export default async function IdeasPage() {
         </div>
       </div>
 
-      <PersonaCard persona="contentStrategist" />
+      <VelaAssistant />
 
       <ContentIdeaBoard ideas={ideas} />
     </div>

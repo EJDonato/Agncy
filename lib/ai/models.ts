@@ -18,13 +18,13 @@ export const GEMINI_CHAT_MODELS = [
 
 export const GEMINI_REVISION_MODELS = GEMINI_CHAT_MODELS;
 
-export const GEMINI_IDEA_MODELS = [
+export const GEMINI_IDEA_MODELS = GEMINI_CHAT_MODELS;
+
+export const GEMINI_ANALYST_MODELS = [
   "gemini-3.5-flash",
   "gemini-3.8-flash",
   "gemini-3.7-flash",
 ] as const;
-
-export const GEMINI_ANALYST_MODELS = GEMINI_IDEA_MODELS;
 
 export const GEMINI_AXIOM_CHAT_MODELS = GEMINI_CHAT_MODELS;
 
