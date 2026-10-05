@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { Check, Loader2, Send, Sparkles } from "lucide-react";
+import { Check, Loader2, Send, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { sendSeraMessageAction } from "@/lib/actions/scripts";
-import type { SeraChatTurn } from "@/lib/ai/sera-chat-contract";
+import type { SendSeraMessage, SeraChatResult, SeraChatTurn } from "@/lib/scripts/sera-chat-contract";
 import { PERSONAS } from "@/lib/personas";
+import { TypewriterText } from "@/components/typewriter-text";
 
 interface SeraChatPanelProps {
   scriptId: string;
@@ -14,6 +14,8 @@ interface SeraChatPanelProps {
   initialTurns: SeraChatTurn[];
   onRevision: (content: string) => void;
   onBusyChange: (isBusy: boolean) => void;
+  onClose: () => void;
+  onReplyingChange: (isReplying: boolean) => void;
 }
 
 const STARTERS = [
@@ -22,34 +24,55 @@ const STARTERS = [
   "Make the spoken lines more conversational",
 ] as const;
 
-export function SeraChatPanel({ scriptId, scriptTitle, currentContent, initialTurns, onRevision, onBusyChange }: SeraChatPanelProps) {
+async function sendSeraMessage(input: SendSeraMessage): Promise<SeraChatResult> {
+  const response = await fetch("/api/scripts/sera-chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  const payload: unknown = await response.json().catch(() => null);
+  const { SeraChatApiResponseSchema } = await import("@/lib/scripts/sera-chat-contract");
+  const parsed = SeraChatApiResponseSchema.safeParse(payload);
+  if (!parsed.success) throw new Error("Sera returned an unreadable response. Your script was not changed.");
+  if (!parsed.data.success) throw new Error(parsed.data.error.message);
+  return parsed.data.result;
+}
+
+export function SeraChatPanel({ scriptId, scriptTitle, currentContent, initialTurns, onRevision, onBusyChange, onClose, onReplyingChange }: SeraChatPanelProps) {
   const [turns, setTurns] = useState(initialTurns);
   const [message, setMessage] = useState("");
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+  const [typingTurnId, setTypingTurnId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const profile = PERSONAS.scriptWriter;
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "nearest" });
-  }, [turns, pendingMessage]);
+  }, [turns, pendingMessage, typingTurnId]);
+
+  useEffect(() => {
+    onReplyingChange(typingTurnId !== null);
+    return () => onReplyingChange(false);
+  }, [onReplyingChange, typingTurnId]);
 
   async function sendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const nextMessage = message.trim();
-    if (!nextMessage || pendingMessage) return;
+    if (!nextMessage || pendingMessage || typingTurnId) return;
     setMessage("");
     setPendingMessage(nextMessage);
     onBusyChange(true);
     setError(null);
     try {
-      const result = await sendSeraMessageAction({
+      const result = await sendSeraMessage({
         requestId: crypto.randomUUID(),
         scriptId,
         currentContent,
         message: nextMessage,
       });
       setTurns((current) => [...current, result.turn]);
+      setTypingTurnId(result.turn.id);
       if (result.revisedContent) onRevision(result.revisedContent);
     } catch (sendError) {
       setMessage(nextMessage);
@@ -61,7 +84,7 @@ export function SeraChatPanel({ scriptId, scriptTitle, currentContent, initialTu
   }
 
   return (
-    <aside className="flex min-h-[520px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-apple-card lg:sticky lg:top-5 lg:h-[calc(100vh-2.5rem)] lg:min-h-0" aria-label="Conversation with Sera">
+    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] backdrop-blur-2xl" aria-label="Conversation with Sera">
       <header className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-blue-50 to-violet-50 px-4 py-4">
         <div className="flex items-center gap-3">
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-white bg-white shadow-sm">
@@ -74,6 +97,9 @@ export function SeraChatPanel({ scriptId, scriptTitle, currentContent, initialTu
             </div>
             <p className="mt-0.5 truncate text-[11px] text-slate-600">Working with you on {scriptTitle}</p>
           </div>
+          <button type="button" onClick={onClose} aria-label="Close chat with Sera" className="apple-press ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-slate-500 hover:bg-white/80 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]">
+            <X className="h-4 w-4" />
+          </button>
         </div>
       </header>
 
@@ -99,8 +125,12 @@ export function SeraChatPanel({ scriptId, scriptTitle, currentContent, initialTu
               {turn.userMessage}
             </div>
             <div className="max-w-[92%] rounded-2xl rounded-tl-md border border-slate-200 bg-slate-50 px-3.5 py-3 text-xs leading-relaxed text-slate-700">
-              <p>{turn.assistantMessage}</p>
-              {turn.action === "revise" && (
+              <TypewriterText
+                animate={turn.id === typingTurnId}
+                onComplete={() => setTypingTurnId((current) => current === turn.id ? null : current)}
+                text={turn.assistantMessage}
+              />
+              {turn.action === "revise" && turn.id !== typingTurnId && (
                 <div className="mt-2 flex items-center gap-1.5 border-t border-slate-200 pt-2 text-[10px] font-mono font-medium text-brand-emerald">
                   <Check className="h-3 w-3" />
                   <span>Applied to script · version saved</span>
@@ -134,7 +164,7 @@ export function SeraChatPanel({ scriptId, scriptTitle, currentContent, initialTu
                 event.currentTarget.form?.requestSubmit();
               }
             }}
-            disabled={Boolean(pendingMessage)}
+            disabled={Boolean(pendingMessage || typingTurnId)}
             maxLength={1_500}
             rows={3}
             aria-label="Message Sera"
@@ -143,12 +173,12 @@ export function SeraChatPanel({ scriptId, scriptTitle, currentContent, initialTu
           />
           <div className="flex items-center justify-between gap-2 px-1">
             <span className="flex items-center gap-1 text-[9px] text-slate-400"><Sparkles className="h-3 w-3" /> Shift + Enter for a new line</span>
-            <button type="submit" disabled={!message.trim() || Boolean(pendingMessage)} aria-label="Send message to Sera" className="apple-btn-primary flex h-8 w-8 items-center justify-center rounded-lg disabled:opacity-40">
-              {pendingMessage ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+            <button type="submit" disabled={!message.trim() || Boolean(pendingMessage || typingTurnId)} aria-label="Send message to Sera" className="apple-btn-primary flex h-8 w-8 items-center justify-center rounded-lg disabled:opacity-40">
+              {pendingMessage || typingTurnId ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
             </button>
           </div>
         </div>
       </form>
-    </aside>
+    </section>
   );
 }

@@ -2,11 +2,12 @@ import { eq } from "drizzle-orm";
 import { ThinkingLevel } from "@google/genai";
 import { db } from "@/lib/db";
 import { brandProfiles, styleRules } from "@/lib/db/schema";
-import type { SeraChatTurn } from "./sera-chat-contract";
 import { SeraChatDecisionGeminiSchema, SeraChatDecisionSchema } from "./sera-chat-contract";
+import { geminiFailureLog, summarizeGeminiFailures } from "./gemini-availability";
 import { getGeminiClient } from "./gemini";
 import { GEMINI_REVISION_MODELS } from "./models";
 import { reviseScript } from "./script-reviser";
+import type { SeraChatTurn } from "@/lib/scripts/sera-chat-contract";
 
 const CHAT_TIMEOUT_MS = 60_000;
 
@@ -20,6 +21,17 @@ export interface SeraConversationResponse {
   action: "discuss" | "revise";
   reply: string;
   revisedContent: string | null;
+}
+
+export class SeraAvailabilityError extends Error {
+  constructor(
+    public readonly kind: "quota_exhausted" | "unavailable",
+    public readonly retryAfterSeconds: number | null,
+    message: string,
+  ) {
+    super(message);
+    this.name = "SeraAvailabilityError";
+  }
 }
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
@@ -68,7 +80,12 @@ Decide whether the creator wants discussion or an applied revision.
 - For discuss, revisionInstruction must be an empty string.
 - For revise, reply should briefly state what you changed, and revisionInstruction must fully describe the requested edit while preserving all unaffected material.`;
 
-  const prompt = `RECENT CONVERSATION:
+  const jsonInstruction = `Return only a JSON object with exactly these fields:
+{"mode":"discuss or revise","reply":"concise response","revisionInstruction":"empty for discuss; complete instruction for revise"}`;
+
+  const prompt = `${jsonInstruction}
+
+RECENT CONVERSATION:
 ${conversationText(params.recentTurns)}
 
 CURRENT SCRIPT:
@@ -78,19 +95,22 @@ NEW CREATOR MESSAGE:
 ${params.message}`;
 
   const ai = getGeminiClient();
-  let lastError: unknown;
+  const failures: unknown[] = [];
   for (const model of GEMINI_REVISION_MODELS) {
     try {
+      const isGemma = model.startsWith("gemma-");
+      const thinkingLevel = isGemma ? ThinkingLevel.MINIMAL : ThinkingLevel.LOW;
       const response = await withTimeout(ai.models.generateContent({
         model,
-        contents: prompt,
+        contents: isGemma ? `${systemInstruction}\n\n${prompt}` : prompt,
         config: {
-          systemInstruction,
-          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+          httpOptions: { timeout: isGemma ? 120_000 : 60_000 },
+          maxOutputTokens: 768,
+          thinkingConfig: { thinkingLevel },
           responseMimeType: "application/json",
-          responseSchema: SeraChatDecisionGeminiSchema,
+          ...(!isGemma && { systemInstruction, responseSchema: SeraChatDecisionGeminiSchema }),
         },
-      }), CHAT_TIMEOUT_MS);
+      }), isGemma ? 120_000 : CHAT_TIMEOUT_MS);
       if (!response.text) continue;
       const decision = SeraChatDecisionSchema.parse(JSON.parse(response.text));
       if (decision.mode === "discuss") {
@@ -102,9 +122,19 @@ ${params.message}`;
       });
       return { action: "revise", reply: decision.reply, revisedContent };
     } catch (error) {
-      lastError = error;
-      console.warn(`Model ${model} failed for Sera conversation:`, error);
+      failures.push(error);
+      console.warn("Sera model attempt failed", { model, ...geminiFailureLog(error) });
     }
   }
-  throw lastError instanceof Error ? lastError : new Error("Sera could not respond right now.");
+  const summary = summarizeGeminiFailures(failures);
+  if (summary.hasQuotaFailure) {
+    throw new SeraAvailabilityError(
+      "quota_exhausted",
+      summary.retryAfterSeconds,
+      summary.hasUnavailableFailure
+        ? "Gemini's primary quota is exhausted and its fallback models are currently busy."
+        : "Gemini's request quota is exhausted.",
+    );
+  }
+  throw new SeraAvailabilityError("unavailable", null, "Gemini is temporarily unavailable.");
 }

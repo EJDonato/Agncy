@@ -2,8 +2,8 @@ import { getPostsWithLatestMetrics } from "@/lib/db/queries/posts";
 import { UploadCsvDialog } from "./_components/upload-csv-dialog";
 import { PostsTable } from "./_components/posts-table";
 import { BarChart3, TrendingUp, Film, Eye, Sparkles } from "lucide-react";
-import { PersonaCard } from "@/components/persona-card";
 import { GeminiPerformanceAnalysis } from "./_components/gemini-performance-analysis";
+import { AxiomAssistant } from "./_components/axiom-assistant";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +37,7 @@ export default async function AnalyticsPage() {
         </div>
       </div>
 
-      <PersonaCard persona="performanceAnalyst" />
+      <AxiomAssistant />
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

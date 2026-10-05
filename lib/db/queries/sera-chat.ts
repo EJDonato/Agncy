@@ -1,7 +1,7 @@
 import { and, asc, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { seraChatTurns } from "@/lib/db/schema";
-import type { SeraChatTurn } from "@/lib/ai/sera-chat-contract";
+import type { SeraChatTurn } from "@/lib/scripts/sera-chat-contract";
 
 const CONTEXT_TURN_LIMIT = 10;
 

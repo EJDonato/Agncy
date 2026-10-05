@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { brandProfiles, styleRules } from "@/lib/db/schema";
 import { getGeminiClient } from "./gemini";
 import { GEMINI_REVISION_MODELS } from "./models";
-import { ScriptDraftResponseSchema, ScriptDraftSchema, formatScriptDraftToMarkdown } from "./schemas";
+import { SCRIPT_DRAFT_JSON_INSTRUCTION, ScriptDraftResponseSchema, ScriptDraftSchema, formatScriptDraftToMarkdown } from "./schemas";
 
 interface ReviseScriptParams {
   currentContent: string;
@@ -48,22 +48,24 @@ Active style rules:
 ${rules}
 
 Apply the user's instruction precisely. Always return a structured script with a hook, separate body beats, visual cues, pacing, and CTA. Never collapse the script into one paragraph.`;
-  const prompt = `USER INSTRUCTION:\n${params.instruction}\n\nCURRENT SCRIPT:\n${params.currentContent}`;
+  const prompt = `${SCRIPT_DRAFT_JSON_INSTRUCTION}\n\nUSER INSTRUCTION:\n${params.instruction}\n\nCURRENT SCRIPT:\n${params.currentContent}`;
   const ai = getGeminiClient();
   let lastError: unknown;
 
   for (const model of GEMINI_REVISION_MODELS) {
     try {
+      const isGemma = model.startsWith("gemma-");
+      const thinkingLevel = isGemma ? ThinkingLevel.MINIMAL : ThinkingLevel.LOW;
       const response = await withTimeout(ai.models.generateContent({
         model,
-        contents: prompt,
+        contents: isGemma ? `${systemInstruction}\n\n${prompt}` : prompt,
         config: {
-          systemInstruction,
-          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+          httpOptions: { timeout: isGemma ? 120_000 : 90_000 },
+          thinkingConfig: { thinkingLevel },
           responseMimeType: "application/json",
-          responseSchema: ScriptDraftResponseSchema,
+          ...(!isGemma && { systemInstruction, responseSchema: ScriptDraftResponseSchema }),
         },
-      }), 90_000);
+      }), isGemma ? 120_000 : 90_000);
       if (response.text) {
         const revisedDraft = ScriptDraftSchema.parse(JSON.parse(response.text));
         return formatScriptDraftToMarkdown(revisedDraft);

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { SeraChatDecisionSchema, SendSeraMessageSchema } from "../lib/ai/sera-chat-contract";
+import { SeraChatDecisionSchema } from "../lib/ai/sera-chat-contract";
+import { SeraChatApiResponseSchema, SendSeraMessageSchema } from "../lib/scripts/sera-chat-contract";
 
 test("accepts a discussion response without a revision instruction", () => {
   const result = SeraChatDecisionSchema.parse({
@@ -28,4 +29,17 @@ test("validates the client request boundary", () => {
     message: "Please improve the hook.",
   });
   assert.equal(result.success, false);
+});
+
+test("accepts a structured quota error with a retry delay", () => {
+  const result = SeraChatApiResponseSchema.parse({
+    success: false,
+    error: {
+      code: "quota_exhausted",
+      message: "Gemini's primary quota resets in about 9h 34m.",
+      retryAfterSeconds: 34_440,
+    },
+  });
+  assert.equal(result.success, false);
+  assert.equal(result.success ? null : result.error.retryAfterSeconds, 34_440);
 });

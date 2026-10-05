@@ -124,6 +124,9 @@ export const ScriptDraftResponseSchema: Schema = {
   required: ["title", "estimated_duration_sec", "total_word_count", "hook", "body_beats", "cta"],
 };
 
+export const SCRIPT_DRAFT_JSON_INSTRUCTION = `Return only JSON with this shape:
+{"title":"string","estimated_duration_sec":45,"total_word_count":120,"hook":{"visual_cue":"string","spoken_text":"string","duration_est_sec":3},"body_beats":[{"beat_number":1,"visual_cue":"string","spoken_text":"string","pacing":"rapid or deliberate or punchy"}],"cta":{"visual_cue":"string","spoken_text":"string"}}`;
+
 export function formatScriptDraftToMarkdown(draft: ScriptDraft): string {
   const lines: string[] = [];
 

@@ -34,25 +34,3 @@ export const SeraChatDecisionGeminiSchema: Schema = {
   },
   required: ["mode", "reply", "revisionInstruction"],
 };
-
-export const SendSeraMessageSchema = z.object({
-  requestId: z.string().uuid(),
-  scriptId: z.string().min(1).max(200),
-  currentContent: z.string().min(1, "Script cannot be empty").max(30_000),
-  message: z.string().trim().min(1, "Write a message for Sera").max(1_500),
-});
-
-export interface SeraChatTurn {
-  id: string;
-  userMessage: string;
-  assistantMessage: string;
-  action: "discuss" | "revise";
-  revisionVersionId: string | null;
-  createdAt: string;
-}
-
-export interface SeraChatResult {
-  turn: SeraChatTurn;
-  revisedContent: string | null;
-  versionNumber: number | null;
-}

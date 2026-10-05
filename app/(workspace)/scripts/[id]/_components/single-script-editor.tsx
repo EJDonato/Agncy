@@ -4,9 +4,10 @@ import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Loader2, RotateCcw, Save } from "lucide-react";
 import { useState } from "react";
 import { saveFinalScriptVersionAction } from "@/lib/actions/scripts";
-import type { SeraChatTurn } from "@/lib/ai/sera-chat-contract";
+import type { SeraChatTurn } from "@/lib/scripts/sera-chat-contract";
 import { ScriptEditorPane } from "./script-editor-pane";
 import { SeraChatPanel } from "./sera-chat-panel";
+import { SeraPresence } from "./sera-presence";
 
 interface SingleScriptEditorProps {
   script: {
@@ -25,7 +26,9 @@ export function SingleScriptEditor({ script, baselineText, initialContent, initi
   const [content, setContent] = useState(initialContent || baselineText);
   const [aiBaseline, setAiBaseline] = useState(baselineText);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSeraChatOpen, setIsSeraChatOpen] = useState(false);
   const [isSeraWorking, setIsSeraWorking] = useState(false);
+  const [isSeraReplying, setIsSeraReplying] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -86,14 +89,10 @@ export function SingleScriptEditor({ script, baselineText, initialContent, initi
       )}
       {error && <div role="alert" className="rounded-xl border border-brand-rose/30 bg-brand-rose/10 p-3.5 text-xs text-brand-rose font-mono">{error}</div>}
 
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
-        <div className="order-2 min-w-0 lg:order-1">
-          <ScriptEditorPane content={content} disabled={isSaving || isSeraWorking} onChange={setContent} />
-        </div>
-        <div className="order-1 min-w-0 lg:order-2">
-          <SeraChatPanel scriptId={script.id} scriptTitle={script.title} currentContent={content} initialTurns={initialChatTurns} onRevision={applySeraRevision} onBusyChange={setIsSeraWorking} />
-        </div>
-      </div>
+      <ScriptEditorPane content={content} disabled={isSaving || isSeraWorking} onChange={setContent} />
+      <SeraPresence isOpen={isSeraChatOpen} isReplying={isSeraReplying} onToggle={() => setIsSeraChatOpen((isOpen) => !isOpen)}>
+        <SeraChatPanel scriptId={script.id} scriptTitle={script.title} currentContent={content} initialTurns={initialChatTurns} onRevision={applySeraRevision} onBusyChange={setIsSeraWorking} onClose={() => setIsSeraChatOpen(false)} onReplyingChange={setIsSeraReplying} />
+      </SeraPresence>
     </div>
   );
 }

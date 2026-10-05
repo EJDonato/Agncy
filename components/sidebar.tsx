@@ -11,7 +11,7 @@ export function Sidebar() {
 
   return (
     <aside 
-      className="hidden md:flex w-64 border-r border-slate-200 bg-white flex-col justify-between h-screen sticky top-0 z-[30] shrink-0 shadow-[1px_0_12px_rgba(0,0,0,0.02)]"
+      className="hidden md:flex w-64 border-r border-slate-200 bg-white flex-col h-screen sticky top-0 z-[30] shrink-0 shadow-[1px_0_12px_rgba(0,0,0,0.02)]"
       aria-label="Sidebar navigation"
     >
       <div>
@@ -67,14 +67,6 @@ export function Sidebar() {
         </nav>
       </div>
 
-      {/* Clean Studio Status Footer */}
-      <div className="p-4 border-t border-slate-200/80 bg-slate-50/50 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-        <span className="font-medium text-slate-600">Local Studio</span>
-        <div className="flex items-center gap-1.5">
-          <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider">Ready</span>
-        </div>
-      </div>
     </aside>
   );
 }
