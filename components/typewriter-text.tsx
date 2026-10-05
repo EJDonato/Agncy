@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ChatMarkdown } from "./chat-markdown";
 
 interface TypewriterTextProps {
   animate: boolean;
@@ -38,14 +39,14 @@ export function TypewriterText({ animate, onComplete, text }: TypewriterTextProp
     return () => window.clearInterval(intervalId);
   }, [animate, text]);
 
-  if (!animate) return <p>{text}</p>;
+  if (!animate) return <ChatMarkdown content={text} />;
   return (
     <>
       <p className="sr-only">{text}</p>
-      <p aria-hidden="true">
-        {text.slice(0, visibleLength)}
+      <div aria-hidden="true">
+        <ChatMarkdown content={text.slice(0, visibleLength)} />
         {visibleLength < text.length && <span className="ml-0.5 inline-block h-[1em] w-px translate-y-[0.15em] animate-pulse bg-[#1f54fc]" />}
-      </p>
+      </div>
     </>
   );
 }

@@ -77,6 +77,7 @@ Decide whether the creator wants discussion or an applied revision.
 - Use "revise" only when the creator clearly asks you to change, rewrite, apply, replace, shorten, expand, or otherwise edit the current script.
 - If the creator refers to an earlier option, resolve it from the conversation and make revisionInstruction self-contained.
 - Keep reply under 90 words. Be specific to the current script and do not use empty praise.
+- Use readable Markdown inside reply when useful: bold key points, bullets, and paragraph breaks. Do not use raw HTML.
 - For discuss, revisionInstruction must be an empty string.
 - For revise, reply should briefly state what you changed, and revisionInstruction must fully describe the requested edit while preserving all unaffected material.`;
 

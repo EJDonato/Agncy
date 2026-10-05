@@ -10,7 +10,7 @@ import { useWorkspaceNavigation } from "@/components/workspace-navigation";
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
-  const { activePath, beginNavigation } = useWorkspaceNavigation();
+  const { activePath, beginNavigation, isNavigating } = useWorkspaceNavigation();
 
   // Close drawer on route navigation
   useEffect(() => {
@@ -125,6 +125,7 @@ export function MobileNav() {
                       title={item.feature}
                       aria-label={`${item.label}: ${item.feature}`}
                       aria-current={isActive ? "page" : undefined}
+                      aria-busy={isActive && isNavigating ? true : undefined}
                       className={cn(
                         "apple-press min-h-[44px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]",
                         isActive
@@ -134,6 +135,7 @@ export function MobileNav() {
                     >
                       <Icon className={cn("w-4 h-4", isActive ? "text-[#1f54fc]" : "text-slate-500")} />
                       <span>{item.label}</span>
+                      {isActive && isNavigating && <span aria-hidden="true" className="ml-auto h-3 w-3 animate-spin rounded-full border-2 border-[#1f54fc]/25 border-t-[#1f54fc] motion-reduce:animate-none" />}
                     </Link>
                   );
                 })}

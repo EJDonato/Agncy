@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
+import { WorkspacePageLoading } from "@/components/workspace-page-loading";
 
 interface PendingNavigation {
   fromPath: string;
@@ -64,12 +65,9 @@ export function WorkspaceContent({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
-        <div
-          key={pathname}
-          className={`apple-page-enter ${isNavigating ? "opacity-60 transition-opacity duration-150" : ""}`}
-        >
-          {children}
+      <div className="mx-auto max-w-7xl p-4 sm:p-6 md:p-8">
+        <div key={isNavigating ? "workspace-navigation-loading" : pathname} className="apple-page-enter">
+          {isNavigating ? <WorkspacePageLoading /> : children}
         </div>
       </div>
     </main>

@@ -74,6 +74,8 @@ Never invent retention curves, demographics, causation, or metrics that are abse
 Name the post titles and metrics supporting a conclusion. Separate observed patterns from hypotheses.
 The creator's niche is ${context.niche}; the target audience is ${context.targetAudience}.
 Do not present expired or unclear time-sensitive opportunities as active.
+Use readable Markdown inside the reply string when useful: bold key findings, short headings, bullets, and paragraph breaks.
+Do not over-format, nest lists, or use raw HTML.
 Keep the reply under 180 words and return only JSON: {"reply":"your answer"}.`;
 
   const prompt = `LATEST SAVED ANALYSIS:

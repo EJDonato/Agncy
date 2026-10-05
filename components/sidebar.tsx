@@ -7,7 +7,7 @@ import { WORKSPACE_NAV_ITEMS } from "@/components/workspace-nav-items";
 import { useWorkspaceNavigation } from "@/components/workspace-navigation";
 
 export function Sidebar() {
-  const { activePath, beginNavigation } = useWorkspaceNavigation();
+  const { activePath, beginNavigation, isNavigating } = useWorkspaceNavigation();
 
   return (
     <aside 
@@ -49,6 +49,7 @@ export function Sidebar() {
                 title={item.feature}
                 aria-label={`${item.label}: ${item.feature}`}
                 aria-current={isActive ? "page" : undefined}
+                aria-busy={isActive && isNavigating ? true : undefined}
                 className={cn(
                   "apple-press flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f54fc]",
                   isActive
@@ -59,7 +60,9 @@ export function Sidebar() {
                 <Icon className={cn("w-4 h-4 transition-colors", isActive ? "text-[#1f54fc]" : "text-slate-400")} />
                 <span>{item.label}</span>
                 {isActive && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#1f54fc] shadow-[0_0_8px_rgba(31,84,252,0.9)] animate-in fade-in zoom-in-75 duration-200" />
+                  isNavigating
+                    ? <span aria-hidden="true" className="ml-auto h-3 w-3 animate-spin rounded-full border-2 border-[#1f54fc]/25 border-t-[#1f54fc] motion-reduce:animate-none" />
+                    : <span aria-hidden="true" className="ml-auto h-1.5 w-1.5 rounded-full bg-[#1f54fc] shadow-[0_0_8px_rgba(31,84,252,0.9)] animate-in fade-in zoom-in-75 duration-200" />
                 )}
               </Link>
             );

@@ -1,6 +1,8 @@
+import React from "react";
+
 export function WorkspacePageLoading() {
   return (
-    <div className="space-y-6 animate-pulse" role="status" aria-label="Loading page">
+    <div className="space-y-6 motion-safe:animate-pulse" role="status" aria-label="Loading destination page">
       <div className="flex items-center justify-between gap-4">
         <div className="space-y-2">
           <div className="h-7 w-48 rounded-xl bg-slate-200/70" />
